@@ -11,6 +11,7 @@ import Cookie from "react-cookie";
 import FWPlugin from ".././common/app.plugin";
 import ReactDOM from "react-dom";
 import Common from  ".././common/app.common";
+import Widget from '.././common/app.widget';
 //import {Link} from 'react-router-dom';
 //import Widget from '.././common/app.widget';
 class Login extends React.Component{
@@ -21,7 +22,7 @@ class Login extends React.Component{
 		console.log('Welcome to login screen');
 		// auto login
 		if(Cookie.load('user') != undefined){
-			this.login();
+			//this.login();
 		}
 	}
 	componentDidMount(){
@@ -46,15 +47,18 @@ class Login extends React.Component{
 				if(Cookie.load("user") == undefined){
 					var date = new Date();
 					date.setFullYear(date.getFullYear() + 10); // set expires 10 year
-					Cookie.save("user", JSON.stringify({username: username, password: password}), {expires: date});
+					Cookie.save("user", JSON.stringify({username: username, password: password, user_id: res.user.user_id}), {expires: date});
 				}
+				Cookie.save("user", JSON.stringify({username: username, password: password, user_id: res.user.user_id}), {expires: date});
 				Common.user = res.user;
-//				location.reload();
-//				location.href="/#/home";
+				Widget.callAndroid({cmd:'set', key:'USER_ID', value: Common.user.user_id});
+				console.log(">>>>>>>>>>>>>>> SEND USER_ID " + Common.user.user_id);
+				location.href="/#/home";
+				location.reload();
 				FWPlugin.closeModal('.login-screen');
 			} else {
 				FWPlugin.modal({
-					title: 'eHotel SUP MerPerle',
+					title: 'ELCOM',
 					text: '<p class="color-red"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> LOGIN FAIL</p>', 
 					buttons: [
 					     {text: '<span class="color-red"><i class="ios-icons">close</i> close</span>', bold: true}
@@ -69,7 +73,7 @@ class Login extends React.Component{
 			<div className="login-screen">
 				<div data-page="login-screen" className="page no-navbar no-toolbar no-swipeback">
 				  <div className="page-content login-screen-content">
-				    <div className="login-screen-title">eHotel SUP MerPerle</div>
+				    <div className="login-screen-title">eSMILE SUPERVISOR</div>
 				    <form>
 				      <div className="thumbnail">
 				      	<img src="/styles/images/logo.png" />

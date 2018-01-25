@@ -5,22 +5,30 @@ import API from '.././common/app.api';
 import ReactDOM from 'react-dom';
 import FWPlugin from '.././common/app.plugin';
 import Common from '.././common/app.common';
+import Widget from '.././common/app.widget';
 import Login from './Login';
+import Header from './Header';
+import Store from './Store';
 var $$ = Dom7;
 class App extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			logo: '/styles/images/logo.png',
+			user: {},
 			location:[],
-			survey: [],
+			ratingDetail: [],
 			rating:[],
 			smile: [],
-			typeScreen: 0, // 0: Room, 1: Front Desk
+			employee:[],
 			color : ['#1ebfae', '#30a5ff', '#ffb53e', '#c7c700', '#f9243f', '#669999']
 		}
 	}
 	componentWillMount(){	
+		
+	}
+	componentDidMount(){
+		var _=this;
 		Common.request({
 			url: '/checkLogin',
 			type: 'POST'
@@ -28,35 +36,34 @@ class App extends Component {
 			Common.logs(res);
 			if(res.status){
 				Common.user = res.user;
-				location.href="/#/home";
+				_.state.user = res.user;
+				Widget.callAndroid({cmd:'set', key:'USER_ID', value: Common.user.user_id});
+//				Widget.callAndroid({cmd:'set', key:'SERVER', value:'http://demo.e-smile.vn:19091/'});
+				console.log("SEND USER_ID " + Common.user.user_id);
+				// initial date
+				var date = Common.getLast30Days();
+				var today = new Date();
+//				$('#date-from').val(moment().subtract('days', 30).format('YYYY-MM-DD')); // get 30 day
+				$('.date-from').val(moment().format('YYYY-MM-DD')); // get today
+				$('.date-to').val(moment().format('YYYY-MM-DD')); // get today
+//				$('#date-from').attr(
+//						   "data-date", 
+//						   moment().subtract('days', 30).format( $('#date-from').attr("data-date-format") ));
+				$('.date-from').attr(
+						   "data-date", 
+						   moment().format( $('.date-from').attr("data-date-format") ));
+				$('.date-to').attr(
+						   "data-date", 
+						   moment().format( $('.date-from').attr("data-date-format")));
+				_.getLocation();
+				setInterval(function(){
+					_.getLocation();
+				}, 5000);
 			} else {
+				location.href="/#/login";
 				FWPlugin.loginScreen('.login-screen');
 			}
 		});
-	}
-	componentDidMount(){
-		var _=this;
-		// initial date
-		var date = Common.getLast30Days();
-		var today = new Date();
-//		$('#date-from').val(moment().subtract('days', 30).format('YYYY-MM-DD')); // get 30 day
-		$('.date-from').val(moment().format('YYYY-MM-DD')); // get today
-		$('.date-to').val(moment().format('YYYY-MM-DD')); // get today
-//		$('#date-from').attr(
-//				   "data-date", 
-//				   moment().subtract('days', 30).format( $('#date-from').attr("data-date-format") ));
-		$('.date-from').attr(
-				   "data-date", 
-				   moment().format( $('.date-from').attr("data-date-format") ));
-		$('.date-to').attr(
-				   "data-date", 
-				   moment().format( $('.date-from').attr("data-date-format") ));
-		_.getRoom();
-//		setInterval(function(){
-//			_.getRoom();
-//		}, 5000);
-
-		
 	}
 	componentWillReceiveProps(newProps){
 	}
@@ -69,22 +76,20 @@ class App extends Component {
 				location.push($(this).val());
 			}
 		 });
-		var from = $('.date-from').attr('data-date');
-		var to = $('.date-to').attr('data-date');
+		var from = $('.date-from').attr('data-date') + ' 06:00';
+		var to = $('.date-to').attr('data-date') + ' 23:00';
 		var opt = {
 				date_from: from, 
 				date_to: to, 
 				location: location, 
-				lang_id: '2'
+				lang_id: '2',
+				id:[],
 		};
     	Common.request({data: opt, url: API.getSmile()}, function(res){
     		var length = res.length;
     		var rating = [];
+    		var ratingDetail = [];
     		// check change data
-//    		if(_.state.rating.length > 0 && length > 0 
-//    			&& res[0].sum == _.state.rating[0].sum){
-//    			return;
-//    		}
     		for(var i = 0; i < length; i++){
     			var obj = {
     				id: res[i].id,
@@ -93,13 +98,37 @@ class App extends Component {
     				sum: (res[i].sum == 0 ? 1: Number(res[i].sum)),
     				item:[]
     			}
+    			if(i > 0){
+    				opt.id.push(res[i].id);
+    				ratingDetail.push(obj);
+    			}
     			rating.push(obj);
     		}
+    		
+    		if(_.state.rating.length > 0 && length > 0 
+        			&& rating[0].sum == _.state.rating[0].sum){
+        			return;
+        	}
     		_.setState({
-    			rating: rating
+    			rating: rating,
+    			ratingDetail: ratingDetail
     		});
-    	_.drawCircleChart(eCircleChart, rating);
-    	_.drawColumnChart(eColumnChart, rating, text);
+    	  _.drawCircleChart(eCircleChart, rating);
+    	  _.drawColumnChart(eColumnChart, rating, text);
+    	  // draw smile Detail Rating
+    	  _.drawCircleChart('#rating__percent__', ratingDetail);
+    	  Common.request({data: opt, url: API.getRating()}, function(res1){
+			  if(res1.length > 0){
+				  var data = res1;
+				  var length = ratingDetail.length;
+				  for(var i = 0; i < length; i++){
+					  ratingDetail[i].item = data[i].rating;
+				  }
+				  _.setState({
+					  ratingDetail: ratingDetail
+		    	  });
+			  }
+		  });
        });
     }
 	
@@ -109,18 +138,10 @@ class App extends Component {
 		for(var i = 0; i < length; i++){
 			var percent = data[i].value*100/data[i].sum; 
 			var classes = data[i].name.toLowerCase().replace(" ", '');
-//			$(element+ ' .text__'+ i).text(data[i].name);
-//			$(element+ ' .percent__'+ i).attr('data-percent', percent.toFixed());
-//			$(element + ' .percent__' + i + ' .percent').text(percent.toFixed() + '%');
-//			$(element + i).easyPieChart({
-//				scaleColor : false,
-//				barColor : this.state.color[i]
-//			});
-//			$(element + i).data('easyPieChart').update(percent.toFixed());
-			$('.text__'+ i).text(data[i].name);
-			$('.percent__'+ i).attr('data-percent', percent.toFixed());
-			$('.percent__' + i + ' .percent').text(percent.toFixed() + '%');
-			$('.percent__' + i).easyPieChart({
+			$(element+ ' .text__'+ i).text(data[i].name);
+			$(element+ ' .percent__'+ i).attr('data-percent', percent.toFixed());
+			$(element + ' .percent__' + i + ' .percent').text(percent.toFixed() + '%');
+			$(element + i).easyPieChart({
 				scaleColor : false,
 				barColor : this.state.color[i]
 			});
@@ -198,202 +219,121 @@ class App extends Component {
 		    }]
 		});
 	}
-	getRoom(){
+	getEmployee(){
 		var _=this;
-		//FWPlugin.showIndicator();
-		Common.request({type:'GET', url: API.getRoom()}, function(res){
-			var length = res.length;
-			var room = [];
-			for(var i = 0; i < length; i++){
-				var obj = {
-					id: res[i].id,
-					name: res[i].name
-				}
-				room.push(obj);
-			}
-			_.setState({
-				location: room,
-				typeScreen: 0
-			});
-			_.getSmile('#roomrating', '#percent__', 'rating_container', 'RATING FOR ROOM');
-			//FWPlugin.hideIndicator();
-		});
+    	Common.request({url: API.getEmployee()}, function(res){
+			  if(res.length > 0){
+				  var data = res;
+				  var length = data.length;
+				  var employee = [];
+				  var listID = [];
+				  for(var i = 0; i < length; i++){
+					  var obj = {
+							 username: data[i].username,
+							 name: data[i].name,
+							 image: API.pathContent() + data[i].image,
+							 smile: []
+					  }
+					  listID.push(data[i].id);
+					  employee.push(obj);
+				  }
+				  _.setState({
+					  employee: employee
+		    	  });
+				  	var location = [];
+					$('.list-room input:checkbox').each(function () {
+						if ($(this).is(':checked')) {
+							location.push($(this).val());
+						}
+					 });
+					var from = $('.date-from').attr('data-date') + ' 06:00';
+					var to = $('.date-to').attr('data-date') + ' 23:00';
+					var opt = {
+							date_from: from, 
+							date_to: to, 
+							location: location, 
+							lang_id: '2',
+							user_id: listID,
+					};
+					Common.request({data: opt, type:'GET', url: API.getEmployeeCompare()}, function(res1){
+						var length = res1.length;
+						var location = [];
+						var data = res1;
+						for(var i = 0; i < length; i++){
+							employee[i].smile = data[i].smile;
+						}
+						_.setState({
+							 employee: employee
+						});
+						
+					});
+			  }
+		  });
 	}
 	getLocation(){
 		var _=this;
-		//FWPlugin.showIndicator();
+		if(_.state.location.length > 0){
+			_.getSmile('#rating', '#fd_percent__', 'fd_rating_container', 'RATING');
+			return;
+		}
 		Common.request({type:'GET', url: API.getLocation()}, function(res){
-			var length = res.length;
-			var location = [];
-			for(var i = 0; i < length; i++){
-				var obj = {
-					id: res[i].id,
-					name: res[i].name
-				}
-				location.push(obj);
-			}
 			_.setState({
-				location: location,
-				typeScreen: 1
+				location: res
 			});
-			_.getSmile('#frontdesk', '#fd_percent__', 'fd_rating_container', 'RATING FOR FRONT DESK');
-			//FWPlugin.hideIndicator();
+			_.getSmile('#rating', '#fd_percent__', 'fd_rating_container', 'RATING');
+			
 		});
 	}
-	getSearch(){
-		var _ =this;
-		if(_.state.typeScreen == 0){
-			_.getRoom();
-		} else if(_.state.typeScreen == 1){
-			_.getLocation();
-		}
+	logout(){
+		location.href="/#/login";
+		Common.request({type:'POST', url: '/logout'}, function(res){
+			if(res.status){
+				FWPlugin.closeModal('.picker-filter');
+				FWPlugin.closePanel();
+				FWPlugin.loginScreen('.login-screen');
+			}
+		});
 	}
-	getSurvey(){
-    	var _= this;
-    	var location = [];
-    	$('.list-room input:checkbox').each(function () {
-    		if ($(this).is(':checked')) {
-    			location.push($(this).val());
-    		}
-    	 });
-    	var from = $('.date-from').attr('data-date');
-    	var to = $('.date-to').attr('data-date');
-    	var json = {
-    			lang_id: "2",
-    			date_from: from, 
-    			date_to: to, 
-    			location: location 
-    	};
-    	Common.request({url:API.getSurvey(), data: json}, function(res){
-    		var length = res.length;
-    		var data = [];
-    		for(var i = 0; i < length; i++){
-    			var obj = new Object();
-    			 var sum = (Number(res[i].sum) == 0? 1: Number(res[i].sum));
-    			 obj.name = res[i].name;
-    			 obj.id = res[i].id;
-    			 obj.excellent = (Number(res[i].excellent)*100/sum).toFixed() + ' %';
-    			 obj.good = (Number(res[i].good)*100/sum).toFixed() + ' %';
-    			 obj.average = (Number(res[i].average)*100/sum).toFixed() + ' %';
-    			 obj.poor = (Number(res[i].poor)*100/sum).toFixed()+ ' %';
-    			 obj.sum = sum;
-    			 data.push(obj);
-    		}
-    		 _.setState({
-	   			  survey: data
-	   		  });
-    	});
-    }
-  render() {
-    return (
-    	<div style={{'height': '100%'}}>
-	    	<div className="statusbar-overlay"></div>
-		    <div className="panel-overlay"></div>
-		    <div className="panel panel-left panel-reveal">
-		      <div className="content-block">
-		        <p>Left panel content goes here</p>
-		      </div>
-		    </div>
-		    <div className="panel panel-right panel-cover">
-		      <div className="content-block">
-		        <p>Right panel content goes here</p>
-		      </div>
-		    </div>
-		    <Login />
-		    <div className="views tabs toolbar-through">
-			      <RoomRating color={this.state.color} 
-			      			 rating={this.state.rating} 
-			      			 logo={this.state.logo}
-			      			 getRoom = {this.getRoom.bind(this)}/>
-			      <Picker location={this.state.location} search={this.getSearch.bind(this)}/>
-			      <FrontDesk color={this.state.color} 
-    			 	location={this.state.location} 
-    			 	logo={this.state.logo}
-			      	rating={this.state.rating} 
-		      		getLocation={this.getLocation.bind(this)} />
-			      <Survey logo={this.state.logo} room={this.state.room} survey={this.state.survey} location={this.state.location} getSurvey={this.getSurvey.bind(this)}/>
-			      <Notify logo={this.state.logo}/>
-			      <Tabbar getRoom={this.getRoom.bind(this)} getLocation={this.getLocation.bind(this)} getSurvey = {this.getSurvey.bind(this)}/>
-			</div>
-    	</div>
-    )
+    render() {
+	    return (
+	    	<div style={{'height': '100%'}}>
+		    	<div className="statusbar-overlay"></div>
+		    	<div className="panel-overlay"></div>
+			    <div className="panel panel-left panel-reveal">
+				    <div className="content-block">
+				      <p className="icon-user">
+				      	<img style={{width: '100px'}} src="/styles/images/user.png"/>
+				      </p>
+				      <p><i className="ios-icons">person</i> {this.state.user.fullname}</p>
+				      <p>
+				      	<a href="#" onClick={this.logout.bind(this)}>
+				      		<i className="ios-icons">logout</i> LOGOUT
+				      	</a>
+				      </p>
+				    </div>
+			    </div>
+			    <Login />
+			    <div className="views tabs toolbar-through">
+				      <Picker location={this.state.location} />
+				      <Rating color={this.state.color} 
+	    			 	location={this.state.location} 
+	    			 	logo={this.state.logo}
+				      	rating={this.state.rating} 
+			      		getLocation={this.getLocation.bind(this)} />
+				      <RatingDetail color={this.state.color} logo={this.state.logo} rating={this.state.ratingDetail} />
+				      <Employee color={this.state.color} logo={this.state.logo} employee={this.state.employee} />
+				      <Store store={this.state.location} logo={this.state.logo}/>
+				      <Notify logo={this.state.logo}/>
+				      <Tabbar getEmployee={this.getEmployee.bind(this)} getLocation={this.getLocation.bind(this)}/>
+				</div>
+	    	</div>
+	    )
   }
 };
 
-class RoomRating extends React.Component{
+class Rating extends React.Component{
 	constructor(props) {
 		super(props);
-		
-	}
-    componentWillMount(){
-    }
-    componentDidMount(){
-    	var _ =this; 
-		var ptrContent = $$('.pull-to-refresh-room');
-		FWPlugin.initPullToRefresh(ptrContent) ;
-		ptrContent.on('ptr:refresh', function (e) {
-			_.props.getRoom();
-		});
-    }
-    openPicker(){
-    	FWPlugin.pickerModal('.picker-filter');
-    }
-    pickerClose(){
-    	this.props.getRoom();
-    }
-	render() {
-		return(
-			<div id="roomrating" className="view view-main tab active">
-				<div className="navbar">
-					<div data-page="roomrating" className="navbar-inner">
-						<div className="left">
-							<img className="logo" src={this.props.logo} />
-						</div>
-						<div className="center sliding">RATING FOR ROOM</div>
-						<div className="right">
-							<a href="#" className="link icon-only open-picker" onClick={this.openPicker.bind(this)}> <i
-								className="ios-icons">more_vertical</i></a>
-						</div>
-					</div>
-				</div>
-				
-				<div className="pages navbar-through">
-					<div className="page" data-page="dashboard">
-						<div className="page-content pull-to-refresh-room" data-ptr-distance="50">
-							<div className="pull-to-refresh-layer">
-								<div className="preloader"></div>
-								<div className="pull-to-refresh-arrow"></div>
-							</div>
-							<div className="content-block">
-								<div className="row">
-								    {this.props.rating.map(function(item, index){
-								    	return(
-								        		<div key={item.id + "__" + item.value} className={$(window).width() <= 320? "col-50": "col-33"}>
-								    				<div className={"easypiechart percent__" + index} id={"percent__" + index}
-								    					data-percent={(item.value*100/item.sum).toFixed()}>
-								    					<span className="percent">{(item.value*100/item.sum).toFixed() + '%'} </span> 
-								    					<span className={"text__" + index}>{item.name}</span>
-								    				</div>
-								    			</div>
-								        	);
-								    }, this)}
-									
-								</div>
-							</div>
-							<div className="content-block">
-								<div id="rating_container" style={{'min-width': '310px'}, {'height': '400px'}, {'margin': '0 auto'}}></div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		);
-	}
-}
-class FrontDesk extends React.Component{
-	constructor(props) {
-		super(props);
-		
 	}
     componentWillMount(){
     }
@@ -406,34 +346,18 @@ class FrontDesk extends React.Component{
 		});
     }
     openPicker(){
-    	FWPlugin.pickerModal('.picker-front-desk');
+    	FWPlugin.pickerModal('.picker-filter');
     }
     pickerClose(){
     	this.props.getLocation();
     }
 	render() {
 		return(
-			<div id="frontdesk" className="view view-main tab">
-				<div className="navbar">
-					<div data-page="frontdesk" className="navbar-inner">
-						<div className="left sliding">
-							<img className="logo" src={this.props.logo} />
-						</div>
-						<div className="center">RATING FOR FRONT DESK</div>
-						<div className="right">
-							<a href="#" className="link icon-only open-picker" onClick={this.openPicker.bind(this)}> <i
-								className="ios-icons">more_vertical</i></a>
-						</div>
-					</div>
-				</div>
-				{/*<!-- Pages-->*/}
-				<div className="pages navbar-through">
+			<div id="rating" className="view view-main tab active">
+				<div className="navbar-through">
+					<Header name="RATING" logo={this.props.logo}/>
 					<div className="page" data-page="dashboard">
-						<div className="page-content pull-to-refresh-frondesk" data-ptr-distance="50">
-							<div className="pull-to-refresh-layer">
-								<div className="preloader"></div>
-								<div className="pull-to-refresh-arrow"></div>
-							</div>
+						<div className="page-content" data-ptr-distance="50">
 							<div className="content-block">
 								<div className="row">
 								    {this.props.rating.map(function(item, index){
@@ -454,75 +378,159 @@ class FrontDesk extends React.Component{
 								<div id="fd_rating_container" style={{'min-width': '310px'}, {'height': '400px'}, {'margin': '0 auto'}}></div>
 							</div>
 						</div>
-
-						{/*./end modal*/}
 					</div>
 				</div>
 			</div>
 		);
 	}
 }
-
-class Survey extends React.Component {
+class RatingDetail extends React.Component {
+    constructor(props) {
+    	super(props);
+    	this.state = {
+    		rating:[]
+    	}
+	}
+    componentWillMount(){
+    	
+    }
+    openPicker(){
+    	FWPlugin.pickerModal('.picker-filter');
+    }
+    
+    componentDidMount(){
+    	var _=this;
+    	setTimeout(function(){
+    		var data = _.props.rating;
+        	var length = data.length;
+    		for(var i = 0; i < length; i++){
+    			var element = '#rating__percent__'+ i;
+    			var percent = data[i].value*100/data[i].sum; 
+    			$(element+ ' .text__'+ i).text(data[i].name);
+    			$(element+ ' .percent__'+ i).attr('data-percent', percent.toFixed());
+    			$(element + ' .percent__' + i).text(percent.toFixed() + '%');
+    			$(element).easyPieChart({
+    				scaleColor : false,
+    				barColor : _.props.color[i]
+    			});
+    			$(element).data('easyPieChart').update(percent.toFixed());
+    		}
+    	}, 5000);
+    	
+    }
+  
+   render() {
+      return (
+    		  <div id="rating_detail" className="view tab">
+    		  	<Header name="DETAIL RATING" logo={this.props.logo}/>
+    			<div className="navbar-through">
+    				<div data-page="rating" className="page">
+    					<div className="page-content rating_container">
+	    					{this.props.rating.map(function(item, index){
+								return (
+									<div key={"rating_detail__" + index} className="row">
+				    			       	  <div className="col-30">
+				    			       	  	  <div className={"easypiechart percent__" + index} id={"rating__percent__" + index} 
+				    			       	  	  		data-percent={(item.value*100/item.sum).toFixed()}>
+				    								<span className="percent">{(item.value*100/item.sum).toFixed() + ' %'}</span>
+				    								<span className={"text__" + index}>{item.name}</span>
+				    						  </div>
+				    			       	  </div>
+				    			       	  <div className="col-70">
+				    			       	  <div className="list-block media-list">	
+		    			       	  			 <ul>
+						    			       	{this.props.rating[index].item.map(function(subItem, idex){
+				    								return (
+				    										<li key={subItem.value + "__" + idex} className="item-content">
+				    								          <div className="item-inner">
+				    								        	  <div className="item-title-row">
+				    								              <div className="item-title">{subItem.name}</div>
+				    								              <div className={"item-after percent__" + idex}>{subItem.num}</div>
+				    								        	  </div>
+				    								          </div>
+				    								        </li>	
+				    								);
+				    							})}
+						    			      </ul>
+						    			    </div>
+				    			       	  </div>
+				    			       </div>
+								);
+							}, this)}
+    					</div>
+    				</div>
+    			</div>
+    		</div>
+      );
+   }
+}
+class Employee extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			data:[]
+			employee:[]
 		}
 	}
     componentWillMount(){
     }
     componentDidMount(){
-    	var _ =this; 
-		var ptrContent = $$('.pull-to-refresh-survey');
-		FWPlugin.initPullToRefresh(ptrContent) ;
-		ptrContent.on('ptr:refresh', function (e) {
-			_.props.getSurvey();
-		});
     }
-    
+    getEmployee(){
+    	var _=this;
+    	Common.request({url: API.getEmployee()}, function(res){
+			  if(res.length > 0){
+				  var data = res;
+				  var length = data.length;
+				  var employee = [];
+				  var listID = [];
+				  for(var i = 0; i < length; i++){
+					  var obj = {
+							 username: data[i].username,
+							 name: data[i].name,
+							 image: API.pathContent() + data[i].image,
+							 smile: []
+					  }
+					  listID.push(data[i].id);
+					  employee.push(obj);
+				  }
+				  _.setState({
+					  employee: employee
+		    	  });
+				  
+			  }
+		  });
+    }
    render() {
       return (
-		  <div id="survey" className="view tab">
-			<div className="navbar">
-				<div data-page="detail" className="navbar-inner">
-					<div className="left sliding">
-						<img className="logo" src={this.props.logo} />
-					</div>
-					<div className="center sliding">SURVEY ROOM</div>
-					<div className="right">
-						<a href="#" className="link icon-only open-picker"> <i
-							className="ios-icons">more_vertical</i>
-						</a>
-					</div>
-				</div>
-			</div>
-			<div className="pages navbar-through">
-				<div data-page="survey" className="page">
-					<div className="page-content list-survey pull-to-refresh-survey">
-						<div className="pull-to-refresh-layer">
-							<div className="preloader"></div>
-							<div className="pull-to-refresh-arrow"></div>
-						</div>
-						{this.props.survey.map(function(item, index){
+		  <div id="employee" className="view tab">
+		   <Header name="EMPLOYEE" logo={this.props.logo}/>
+			<div className="navbar-through">
+				<div data-page="employee" className="page">
+					<div className="page-content">
+						{this.props.employee.map(function(item, index){
 							return (
-									<div key={item.sum + "__" + index} className="card">
-								      <div className="card-header">{item.name}</div>
+									<div key={item.username} className="card">
+								      <div className="card-header">
+								      	<div className="row" style={{width: '100%'}}>
+								      		<div className="col-15">
+									      		<img style={{width: '35px', height:'35px', 'borderRadius': '50%'}} src={item.image}/>
+								      		</div>
+									      	<div className="col-85">
+										      	<span>{item.name}</span>
+									      	</div>
+								      	</div>
+								      		
+								      </div>
 									  <div className="card-content">
 									    <div className="card-content-inner">
 							            	<div className="row center">
-								           		<div className="col-25">
-								            		<span className="percent___0">{item.excellent}</span>
-								            	</div>
-							            		<div className="col-25">
-							            			<span className="percent___1">{item.good}</span>
-							            		</div>
-								           		<div className="col-25">
-								            		<span className="percent___2">{item.average}</span>
-								            	</div>
-								          		<div className="col-25">
-								        			<span className="percent___3">{item.poor}</span>
-								            	</div>
+							            		{this.props.employee[index].smile.map(function(subItem, idx){
+							            			return (
+							            					<div key={subItem.name} className="col-25">
+											            		<span className={"percent__" + idx}>{subItem.num}</span>
+											            	</div>
+									            	);
+							            		})}
 								            </div>
 									    </div>
 									  </div>
@@ -551,7 +559,7 @@ class Notify extends React.Component {
     	setInterval(this.checkNotify.bind(this), 5000);
     }
     checkNotify(){
-    	Common.request({url:API.getNotify()}, function(res){
+    	Common.request({url:API.getNotify(), data: {user_id: Common.user == null? '-1' : Common.user.user_id}, type: 'GET'}, function(res){
 			var notifications = [];
 			var length = res.length;
 			var open = 0;
@@ -562,9 +570,6 @@ class Notify extends React.Component {
 					status: res[i].status,
 					time: res[i].time,
 					location: res[i].location,
-					checkin: res[i].checkin,
-					checkout: res[i].checkout,
-					guest: res[i].guest,
 					room: res[i].folio
 				}
 				if(obj.status == 0){
@@ -596,14 +601,14 @@ class Notify extends React.Component {
 		var $this = ReactDOM.findDOMNode(this.refs["noty__" + item.id]);
 		var arr = [];
 		arr.push(item.id);
-		FWPlugin.confirm('Are you sure?', 'eHotel SUP MerPerle', function () {
+		FWPlugin.confirm('Are you sure delete?', 'GUNICHE', function () {
 	   		var obj = {
-	   			id: arr
+	   			id: arr,
+	   			user_id: Common.user.user_id
 	   	  };
 		 Common.request({url: API.deleteNotify(), data: obj, type: 'GET'}, function(response){
 			 if(response.status == "1"){
-				// $("#noty__" + item.id).remove();
-				 _.checkNotify()
+				 _.checkNotify();
 			 }
 		 });
 		});
@@ -623,12 +628,6 @@ class Notify extends React.Component {
 		var room =  <div className="item-text">
 				    	<i className="fa fa-home" aria-hidden="true"></i> {obj.room}
 				    </div>	;	     
-    	var checkin =  <div className="item-text">
-					    	<i className="fa fa-sign-in" aria-hidden="true"></i> {obj.checkin}
-					    </div>;
-		var checkout = <div className="item-text">
-				    	 <i className="fa fa-sign-out" aria-hidden="true"></i> {obj.checkout}
-				       </div>;
 		if(obj.status == 1){
     		badge = <span className="badge"></span>;
     	}
@@ -649,13 +648,8 @@ class Notify extends React.Component {
 								{badge}
 				          </div>
 				        </div>
-						
 						{obj.time != "" ? time : ""}
 						{obj.location != "" ? location : ""}
-						{obj.guest != "" ? guest : ""}
-				        {obj.room != "" ? room : ""}
-				        {obj.checkin != "" ? checkin: ""}
-				        {obj.checkout != ""?checkout:""}
 				      </div>
 				    </a>
 				  </div>
@@ -671,13 +665,14 @@ class Notify extends React.Component {
 	deleteAll(){
 		var _=this;
 		var arr = [];
-		FWPlugin.confirm('Are you sure delete all?', 'eHotel SUP MerPerle', function () {
+		FWPlugin.confirm('Are you sure delete all?', 'GUNICHE', function () {
 			var notify = _.state.notifications
 			for(var i = 0;i < notify.length; i++){
 				arr.push(notify[i].id);
 			}
 	   		var obj = {
-	   			id: [-1]
+	   			id: [-1],
+	   			user_id: Common.user.user_id
 	   	  };
 		 Common.request({url: API.deleteNotifyAll(), data: obj, type: 'GET'}, function(response){
 			 if(response.status == "1"){
@@ -689,31 +684,9 @@ class Notify extends React.Component {
 	render(){
 		return (
 			<div id="notify" className="view tab">
-		        <div className="pages navbar-fixed">
+				<Header name="NOTIFICATION" logo={this.props.logo}/>
+		        <div className="navbar-fixed">
 		          <div data-page="notify" className="page">
-		            <div className="navbar">
-			          <div data-page="notify" className="navbar-inner">
-			            <div className="left sliding">
-			            	<img className="logo" src={this.props.logo} />
-			            </div>
-			            <div className="center sliding">NOTIFICATIONS</div>
-			            <div className="right">
-				            <a href="#" onClick={this.deleteAll.bind(this)} className="tab-link"> <i
-									className="ios-icons">trash</i> </a>
-				           {/* <div className="toolbar tabbar tabbar-labels">
-								<div className="toolbar-inner">
-									<a href="#" onClick={this.checkAll.bind(this)} className="tab-link"> 
-										<i className="ios-icons">circle</i>
-										<span className="tabbar-label">Select all</span></a>
-									
-									<a href="#"
-										className="tab-link"> <i className="ios-icons">redo</i><span
-										className="tabbar-label">Cancel</span></a>
-								</div>
-							</div>*/}
-			            </div>
-			          </div>
-			        </div>
 		            <div className="page-content">
 		              <div className="list-block media-list">
 						  <ul>
@@ -732,7 +705,7 @@ class Picker extends React.Component{
     	
     }
     pickerClose(){
-    	this.props.search();
+    	
     }
     constructor(props) {
 		super(props);   
@@ -745,38 +718,13 @@ class Picker extends React.Component{
     	    searchIn: '.item-title'
     	});   
     }
-    searchChange(){
-    	if($('#checkbox-all').is(':checked')){
-    		$('.list-room input:checkbox').each(function () {
-    			if ($(this).is(':checked')) {
-    				$(this).attr('checked', false);
-    			}
-    		 });
-    	} else {
-//    		$("input:checkbox").attr("checked",true);
-//    		$('.list-room li').trigger('click');
-//    		$('.list-room input:checkbox').each(function () {
-//    			if (!$(this).is(':checked')) {
-//    				$(this).attr('checked', true).change();
-//    			}
-//    			$(this).attr('checked', true)
-//    		 });
-    	}
-    }
+    
 	render(){
 		return(
 		  <div className="picker-modal picker-filter">
 			<div className="toolbar">
 				<div className="toolbar-inner">
-					<div className="left">
-						{/*<label className="label-checkbox item-content" onClick={this.searchChange.bind(this)}>
-							<input type="checkbox" id="checkbox-all" defaultChecked name="checkbox-all" />
-							<div className="item-media">
-								<i className="icon icon-form-checkbox"></i>
-						     </div>
-							<div className="item-inner" style={{float:'right', marginTop:'-22px', marginLeft:'30px'}}>select all</div>
-						</label> */}
-					</div>
+					<div className="left"></div>
 					<div className="right">
 						<a href="#" className="close-picker" onClick={this.pickerClose.bind(this)}>Done</a>
 					</div>
@@ -854,30 +802,35 @@ class Tabbar extends React.Component {
    getLocation(){
 	   this.props.getLocation();
    }
-   getRoom(){
-	   this.props.getRoom();
+   getEmployee(){
+	   this.props.getEmployee();
    }
-   getSurvey(){
-	  this.props.getSurvey();
-   }
+  
    getNotify(){
 	   this.props.getNotify();
+   }
+   getStore(){
+	   
    }
    render() {
       return (
     		 <div className="toolbar tabbar tabbar-labels">
 				<div className="toolbar-inner">
-					<a href="#roomrating" onClick={this.getRoom.bind(this)} className="tab-link active"> <i
-						className="ios-icons">star_fill</i><span
-						className="tabbar-label">Room</span></a>
-					<a href="#frontdesk" onClick={this.getLocation.bind(this)} className="tab-link"> 
+					<a href="#rating" onClick={this.getLocation.bind(this)} className="tab-link active"> 
 						<i className="fa fa-smile-o" style={{fontSize: '27px'}} aria-hidden="true"></i>
-						<span className="tabbar-label">Front Desk</span></a>
-					<a href="#survey" onClick={this.getSurvey.bind(this)} className="tab-link"> <i
-						className="ios-icons">favorites_fill</i> <span className="tabbar-label">Survey</span></a>
+						<span className="tabbar-label">RATRING</span></a>
+					<a href="#rating_detail" onClick={this.getLocation.bind(this)} className="tab-link"> <i
+						className="ios-icons">favorites_fill</i> <span className="tabbar-label">DETAIL RATING</span></a>
+					<a href="#employee" onClick={this.getEmployee.bind(this)} className="tab-link"> 
+						<i className="fa fa-users" style={{fontSize: '27px'}} aria-hidden="true"></i>
+						<span className="tabbar-label">EMPLOYEE</span></a>
+					<a href="#store" onClick = {this.getStore.bind(this)} className="tab-link">
+						<i className="fa fa-shopping-bag" style={{fontSize: '27px'}} aria-hidden="true"></i>
+						<span className="tabbar-label">STORE</span>
+					</a>
 					<a href="#notify"
 						className="tab-link"> <i className="ios-icons icons-bell">bell_fill<span className="badge bg-red hidden">0</span></i><span
-						className="tabbar-label">Notifications</span></a>
+						className="tabbar-label">NOTIFICATION</span></a>
 				</div>
 			</div>
       );

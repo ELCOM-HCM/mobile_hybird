@@ -5,7 +5,7 @@
 import React from 'react';
 import { render } from 'react-dom';
 import FWPlugin from './common/app.plugin';
-import App from './components/AppVinpearl';
+import App from './components/AppMobile';
 import Common from './common/app.common';
 
 render(<App/>, document.getElementById('root'));
@@ -30,6 +30,18 @@ $$('.date-to').on('change', function(){
 	this.setAttribute(
 	   "data-date", 
 	   moment(this.value, "YYYY-MM-DD").format( this.getAttribute("data-date-format") ));
+});
+FWPlugin.onPageInit('rating', function(page){
+//	var date = Common.getLast30Days();
+//	var today = new Date();
+//	$$('#date-from').val(moment().subtract('days', 30).format('YYYY-MM-DD'));
+//	$$('#date-to').val(moment().format('YYYY-MM-DD'));
+//	$$('#date-from').attr(
+//			   "data-date", 
+//			   moment().subtract('days', 30).format( $$('#date-from').attr("data-date-format") ));
+//	$$('#date-to').attr(
+//			   "data-date", 
+//			   moment().format( $$('#date-from').attr("data-date-format") ));
 });
 FWPlugin.init();
 

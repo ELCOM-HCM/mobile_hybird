@@ -20,15 +20,15 @@
   -webkit-flex-shrink: 0;
   -ms-flex: 0 0 auto;
   flex-shrink: 0;
-  color: #fff !important;
+  color: #058cb3 !important;
 }
 .login-screen-content form {
   position: relative;
   z-index: 1;
   background: #fff;
-  -webkit-box-shadow: 0px 0px 26px -3px #fff;
-  -moz-box-shadow: 0px 0px 26px -3px #fff;
-  box-shadow: 0px 0px 26px -3px #fff;
+  -webkit-box-shadow: 0px 0px 26px -3px #058cb3;
+  -moz-box-shadow: 0px 0px 26px -3px #058cb3;
+  box-shadow: 0px 0px 26px -3px #058cb3;
   max-width: 300px;
   margin: 0 auto 100px;
   padding: 10px;
@@ -41,18 +41,15 @@
 .login-screen-content form .thumbnail {
   background: transparent;
   height: 100px;
-  margin: -75px auto 30px;
-  padding: 20px 30px;
   border-top-left-radius: 100%;
   border-top-right-radius: 100%;
   border-bottom-left-radius: 100%;
   border-bottom-right-radius: 100%;
   box-sizing: border-box;
-  margin-left: 25%;
 }
 .login-screen-content form .thumbnail img {
   display: block;
-  width: 100px;
+  width: 100%;
 }
 .login-screen-content form input {
   outline: 0;
@@ -69,14 +66,14 @@
   font-size: 14px;
 }
 .login-screen-content form a:active {
-  background: #fff !important;
+  background: #058cb3 !important;
 }
 .login-screen-content form .button {
   font-size: 17px;
   font-weight: bold;
-  border: 1px solid #fff;
+  border: 1px solid #058cb3;
 }
 .login-screen-content form .button.active {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(5, 140, 179, 0.8);
   color: #fff;
 }

@@ -1,5 +1,24 @@
 img.logo {
-  width: 35px;
+  width: 135px;
+}
+.panel {
+  background: #058cb3;
+}
+.panel .icon-user {
+  text-align: center;
+}
+.panel .icon-user img {
+  width: 100px;
+}
+.panel .content-block {
+  color: #fff;
+}
+.panel .content-block p {
+  font-size: 17px;
+}
+.panel .content-block p i {
+  color: #fff;
+  margin-right: 5px;
 }
 .easypiechart {
   position: relative;
@@ -26,32 +45,26 @@ img.logo {
   top: 60px;
   width: 100%;
 }
-.percent__0,
-.percent___0 {
-  color: #4cd964 !important;
+.percent__0 {
+  color: #4cd964 ! important;
 }
-.percent__1,
-.percent___1 {
-  color: #007aff !important;
+.percent__1 {
+  color: #007aff ! important;
 }
-.percent__2,
-.percent___2 {
-  color: #ff9500 !important;
+.percent__2 {
+  color: #ff9500 ! important;
 }
-.percent__3,
-.percent___3 {
-  color: #ffcc00 !important;
+.percent__3 {
+  color: #ffcc00 ! important;
 }
-.percent__4,
-.percent___4 {
-  color: #ff3b30 !important;
+.percent__4 {
+  color: #ff3b30 ! important;
 }
-.percent__5,
-.percent___5 {
-  color: #8e8e93 !important;
+.percent__5 {
+  color: #8e8e93 ! important;
 }
 .picker-filter.picker-modal {
-  height: 520px;
+  height: 300px;
 }
 .picker-filter .list-block {
   margin: 15px 0;
@@ -100,6 +113,19 @@ img.logo {
 }
 #rating .list-block .item-title {
   color: rgba(255, 255, 255, 0.8);
+}
+#rating_detail .list-block ul {
+  background: transparent;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  color: #fff;
+}
+#rating_detail .easypiechart {
+  position: relative;
+  text-align: center;
+  margin: 50% auto 10px auto;
 }
 #notify .list-block {
   margin-top: 5px;
