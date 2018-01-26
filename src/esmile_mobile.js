@@ -31,7 +31,7 @@ $$('.date-to').on('change', function(){
 	   "data-date", 
 	   moment(this.value, "YYYY-MM-DD").format( this.getAttribute("data-date-format") ));
 });
-FWPlugin.onPageInit('rating', function(page){
+FWPlugin.onPageInit('trend', function(page){
 //	var date = Common.getLast30Days();
 //	var today = new Date();
 //	$$('#date-from').val(moment().subtract('days', 30).format('YYYY-MM-DD'));

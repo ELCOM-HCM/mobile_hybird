@@ -4,7 +4,7 @@ var eAPI = {
 	port:'3000'
 }
 eAPI.pathContent = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/content/';
+	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/content/';
 }
 eAPI.login = function(){
 	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/tablet/login';
@@ -39,6 +39,9 @@ eAPI.getEmployeeCompare = function(){
 }
 eAPI.getSmile = function(){
 	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/smile';
+}
+eAPI.getTrend = function(){
+	return 'http://esmile.e-smile.vn:19094/trend.json';
 }
 eAPI.getRating = function(){
 	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/rating/all';

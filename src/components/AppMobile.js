@@ -8,7 +8,7 @@ import Common from '.././common/app.common';
 import Widget from '.././common/app.widget';
 import Login from './Login';
 import Header from './Header';
-import Store from './Store';
+import Trend from './Trend';
 var $$ = Dom7;
 class App extends Component {
 	constructor(props) {
@@ -17,9 +17,12 @@ class App extends Component {
 			logo: '/styles/images/logo.png',
 			user: {},
 			location:[],
+			locationStorage: [],
+			filter:[{id: 1, name:'Last 24h', type:'hour'}, {id: 2, name:'1 Month', type:'day'}, {id: 3,name:'2 Month', type:'day'}, {id: 4, name:'6 Month', type:'month'}, {id: 5, name:'This Year', type:'month'}, {id: 6, name:'Last Year', type:'month'}],
 			ratingDetail: [],
 			rating:[],
 			smile: [],
+			trend:[],
 			employee:[],
 			color : ['#1ebfae', '#30a5ff', '#ffb53e', '#c7c700', '#f9243f', '#669999']
 		}
@@ -55,9 +58,10 @@ class App extends Component {
 				$('.date-to').attr(
 						   "data-date", 
 						   moment().format( $('.date-from').attr("data-date-format")));
-				_.getLocation();
+				_.getTrend();
+				//_.getLocation();
 				setInterval(function(){
-					_.getLocation();
+					//_.getLocation();
 				}, 5000);
 			} else {
 				location.href="/#/login";
@@ -67,7 +71,151 @@ class App extends Component {
 	}
 	componentWillReceiveProps(newProps){
 	}
-	
+	getTrend(){
+		this.setState({
+			location: this.state.filter
+		});
+		var id = '';
+		var type = 'hour';
+		var from = moment().subtract(24, 'hours').format('DD/MM/YYYY HH:mm:ss').replace(new RegExp('/', 'g'), '-');
+		var to = moment().format('DD/MM/YYYY HH:mm:ss').replace(new RegExp('/', 'g'), '-');
+		$('.list-room input:checkbox').each(function () {
+			if ($(this).is(':checked')) {
+				id = $(this).val();
+			}
+		 });
+		switch(id){
+			case 2:
+				from = moment().subtract(1, 'months').format('DD/MM/YYYY HH:mm:ss').replace(new RegExp('/', 'g'), '-');
+				to = moment().format('DD/MM/YYYY HH:mm:ss').replace(new RegExp('/', 'g'), '-');
+				break;
+			case 3: 
+				from = moment().subtract(3, 'months').format('DD/MM/YYYY HH:mm:ss').replace(new RegExp('/', 'g'), '-');
+				to = moment().format('DD/MM/YYYY HH:mm:ss').replace(new RegExp('/', 'g'), '-');
+				break;
+			case 4: 
+				from = moment().subtract(6, 'months').format('DD/MM/YYYY HH:mm:ss').replace(new RegExp('/', 'g'), '-');
+				to = moment().format('DD/MM/YYYY HH:mm:ss').replace(new RegExp('/', 'g'), '-');
+				break;
+			case 5: 
+				from = moment().subtract(1, 'months').format('DD/MM/YYYY HH:mm:ss').replace(new RegExp('/', 'g'), '-');
+				to = moment().format('DD/MM/YYYY HH:mm:ss').replace(new RegExp('/', 'g'), '-');
+				break;
+			case 6:
+				from = moment().startOf('year').format('DD/MM/YYYY HH:mm:ss').replace(new RegExp('/', 'g'), '-');
+				to = moment().format('DD/MM/YYYY HH:mm:ss').replace(new RegExp('/', 'g'), '-');
+				break;
+		}
+		
+		var opt = {
+				date_from: from, 
+				date_to: to, 
+				lang_id: '2',
+				type: type// hour, day, month,
+		};
+		var _=this;
+		console.log(opt);
+		Common.request({data: opt, url: API.getTrend()}, function(res){
+			 _.linearRegresion('Excellent Customer Experience Trend', '#trend_excellent', [[1, 9], [2, 7], [3, 20]], '#4cd964');
+			 _.linearRegresion('Good Customer Experience Trend','#trend_good', [[1, 9], [2, 15], [3, 45]], '#007aff');
+			 _.linearRegresion('Average Customer Experience Trend', '#trend_average', [[1, 9], [2, 15], [3, 17]], '#ff9500');
+			 _.linearRegresion('Poor Customer Experience Trend', '#trend_poor', [[1, 9], [2, 15], [3, 9]], '#ffcc00');
+			 _.linearRegresion('Very Poor Customer Experience Trend', '#trend_verypoor', [[1, 9], [2, 15], [3, 5]], '#ff3b30');
+		})
+	}
+	linearRegresion(title, id, data, color){
+		$(id).highcharts({
+		    chart: {
+		      type: 'scatter',
+		      zoomType: 'xy',
+		      backgroundColor:'transparent'
+		    },
+		    title: {
+		    	style: {
+		            color: 'rgba(255,255,255,0.8)'
+		        },
+		      text: title
+		    },
+		    subtitle: {
+		      text: ''
+		    },
+		    xAxis: {
+		    	labels: {
+	                style: {
+	                    color: 'rgba(255,255,255,0.8)'
+	                }
+	            },
+		      startOnTick: true,
+		      endOnTick: true,
+		      showLastLabel: true,
+		      categories: ['26/01/2018', '27/01/2018', '28/01/2018', '29/01/2018', '30/01/2018', '31/01/2018', '01/02/2018', '02/02/2018', '26/01/2018']
+		    },
+		    yAxis: {
+		    	labels: {
+	                style: {
+	                    color: 'rgba(255,255,255,0.8)'
+	                }
+	            },
+		      title: {
+		        text: 'Number',
+		        style: {
+		            color: 'rgba(255,255,255,0.8)'
+		        }
+		      }
+		    },
+		    plotOptions: {
+		      scatter: {
+		        marker: {
+		          radius: 5,
+		          states: {
+		            hover: {
+		              enabled: true,
+		              lineColor: 'rgb(100,100,100)'
+		            }
+		          }
+		        },
+		        states: {
+		          hover: {
+		            marker: {
+		              enabled: false
+		            }
+		          }
+		        },
+		        tooltip: {
+		          headerFormat: '<b>{series.name}</b><br>',
+		          pointFormat: '<b>{point.category}:</b> {point.x}'
+		        }
+		      }
+		    },
+		    series: [{
+		      regression: true,
+		      regressionSettings: {
+		        type: 'polynomial',
+		        color: color,
+		        extrapolate: 5,
+		        name: 'Trend'
+		      },
+		      name: 'Rating',
+		      color: color,
+		      data: data
+
+		    }]
+		  });
+	}
+	getRating(){
+		var from = moment().subtract(24, 'hours').format('DD/MM/YYYY HH:mm:ss');
+		var to = $('.date-to').attr('data-date') + ' ' + moment().format('HH:mm:ss');
+		var opt = {
+				date_from: from, 
+				date_to: to, 
+				lang_id: '2',
+				type: 'hour'// hour, day, month,
+		};
+		console.log(opt);
+		Common.request({data: opt, url: API.getTrend()}, function(res){
+			
+		});
+	}
 	getSmile(eParent, eCircleChart, eColumnChart, text){
 		var _=this;
 		var location = [];
@@ -272,13 +420,17 @@ class App extends Component {
 	}
 	getLocation(){
 		var _=this;
-		if(_.state.location.length > 0){
+		if(_.state.locationStorage.length > 0){
+			_.setState({
+				location: _.state.locationStorage,
+			});
 			_.getSmile('#rating', '#fd_percent__', 'fd_rating_container', 'RATING');
 			return;
 		}
 		Common.request({type:'GET', url: API.getLocation()}, function(res){
 			_.setState({
-				location: res
+				location: res,
+				locationStorage: res
 			});
 			_.getSmile('#rating', '#fd_percent__', 'fd_rating_container', 'RATING');
 			
@@ -314,15 +466,17 @@ class App extends Component {
 			    </div>
 			    <Login />
 			    <div className="views tabs toolbar-through">
-				      <Picker location={this.state.location} />
-				      <Rating color={this.state.color} 
+				     <Picker location={this.state.location} />
+				     <Trend color={this.state.color} logo={this.state.logo} trend={this.state.trend} />
+			    	 <Rating color={this.state.color} 
 	    			 	location={this.state.location} 
 	    			 	logo={this.state.logo}
 				      	rating={this.state.rating} 
 			      		getLocation={this.getLocation.bind(this)} />
 				      <RatingDetail color={this.state.color} logo={this.state.logo} rating={this.state.ratingDetail} />
+				      
+			    	  
 				      <Employee color={this.state.color} logo={this.state.logo} employee={this.state.employee} />
-				      <Store store={this.state.location} logo={this.state.logo}/>
 				      <Notify logo={this.state.logo}/>
 				      <Tabbar getEmployee={this.getEmployee.bind(this)} getLocation={this.getLocation.bind(this)}/>
 				</div>
@@ -353,7 +507,7 @@ class Rating extends React.Component{
     }
 	render() {
 		return(
-			<div id="rating" className="view view-main tab active">
+			<div id="rating" className="view view-main tab">
 				<div className="navbar-through">
 					<Header name="RATING" logo={this.props.logo}/>
 					<div className="page" data-page="dashboard">
@@ -445,7 +599,7 @@ class RatingDetail extends React.Component {
 				    								          <div className="item-inner">
 				    								        	  <div className="item-title-row">
 				    								              <div className="item-title">{subItem.name}</div>
-				    								              <div className={"item-after percent__" + idex}>{subItem.num}</div>
+				    								              <div className={"item-after percent__" + idex} style={{color: '#fff'}}>{subItem.num}</div>
 				    								        	  </div>
 				    								          </div>
 				    								        </li>	
@@ -526,7 +680,7 @@ class Employee extends React.Component {
 							            	<div className="row center">
 							            		{this.props.employee[index].smile.map(function(subItem, idx){
 							            			return (
-							            					<div key={subItem.name} className="col-25">
+							            					<div key={subItem.name} className="col-20">
 											            		<span className={"percent__" + idx}>{subItem.num}</span>
 											            	</div>
 									            	);
@@ -601,9 +755,9 @@ class Notify extends React.Component {
 		var $this = ReactDOM.findDOMNode(this.refs["noty__" + item.id]);
 		var arr = [];
 		arr.push(item.id);
-		FWPlugin.confirm('Are you sure delete?', 'GUNICHE', function () {
+		FWPlugin.confirm('Are you sure delete?', 'VietNam Airline', function () {
 	   		var obj = {
-	   			id: arr,
+	   			id: [-1],//arr,
 	   			user_id: Common.user.user_id
 	   	  };
 		 Common.request({url: API.deleteNotify(), data: obj, type: 'GET'}, function(response){
@@ -665,7 +819,7 @@ class Notify extends React.Component {
 	deleteAll(){
 		var _=this;
 		var arr = [];
-		FWPlugin.confirm('Are you sure delete all?', 'GUNICHE', function () {
+		FWPlugin.confirm('Are you sure delete all?', 'VIETNAM AIRLINE', function () {
 			var notify = _.state.notifications
 			for(var i = 0;i < notify.length; i++){
 				arr.push(notify[i].id);
@@ -718,7 +872,9 @@ class Picker extends React.Component{
     	    searchIn: '.item-title'
     	});   
     }
-    
+    handleClick(){
+    	console.log('change');
+    }
 	render(){
 		return(
 		  <div className="picker-modal picker-filter">
@@ -748,8 +904,8 @@ class Picker extends React.Component{
 						{this.props.location.map(function(item){
 							return(
 								<li key={'picker__' + item.id}>
-								  <label className="label-checkbox item-content">
-									     <input type="checkbox" name="room-checkbox" defaultChecked value={item.id} />
+								  <label className="label-checkbox item-content" onClick={this.handleClick}>
+									     <input type="checkbox" name="room-checkbox" defaultChecked={true} value={item.id} />
 									     <div className="item-media">
 									       <i className="icon icon-form-checkbox"></i>
 									     </div>
@@ -809,14 +965,18 @@ class Tabbar extends React.Component {
    getNotify(){
 	   this.props.getNotify();
    }
-   getStore(){
-	   
+   getTrend(){
+	   console.log('get trend');
    }
    render() {
       return (
     		 <div className="toolbar tabbar tabbar-labels">
 				<div className="toolbar-inner">
-					<a href="#rating" onClick={this.getLocation.bind(this)} className="tab-link active"> 
+					<a href="#trend" onClick = {this.getTrend.bind(this)} className="tab-link active">
+						<i className="fa fa-line-chart" style={{fontSize: '27px'}} aria-hidden="true"></i>
+						<span className="tabbar-label">TREND</span>
+					</a>
+					<a href="#rating" onClick={this.getLocation.bind(this)} className="tab-link"> 
 						<i className="fa fa-smile-o" style={{fontSize: '27px'}} aria-hidden="true"></i>
 						<span className="tabbar-label">RATRING</span></a>
 					<a href="#rating_detail" onClick={this.getLocation.bind(this)} className="tab-link"> <i
@@ -824,10 +984,6 @@ class Tabbar extends React.Component {
 					<a href="#employee" onClick={this.getEmployee.bind(this)} className="tab-link"> 
 						<i className="fa fa-users" style={{fontSize: '27px'}} aria-hidden="true"></i>
 						<span className="tabbar-label">EMPLOYEE</span></a>
-					<a href="#store" onClick = {this.getStore.bind(this)} className="tab-link">
-						<i className="fa fa-shopping-bag" style={{fontSize: '27px'}} aria-hidden="true"></i>
-						<span className="tabbar-label">STORE</span>
-					</a>
 					<a href="#notify"
 						className="tab-link"> <i className="ios-icons icons-bell">bell_fill<span className="badge bg-red hidden">0</span></i><span
 						className="tabbar-label">NOTIFICATION</span></a>
