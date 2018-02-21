@@ -1,64 +1,58 @@
-import Common from './app.common';
+import eCommon from './app.common';
 var eAPI = {
-	ip: 'esmile.e-smile.vn',
-	port:'3000'
+	ip: 'esmile.e-smile.vn', //'103.254.12.200',
+	port:'3001'
 }
 eAPI.pathContent = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/content/';
+	return 'http://' + eAPI.ip + ':3001' + '/ecopark/content/';
 }
 eAPI.login = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/tablet/login';
+	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/tablet/login';
 }
 eAPI.location = function(){
-		return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/tablet/location?id=' + Common.user.id;
+		return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/tablet/location';
 }
 eAPI.register = function(type){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/tablet/register';
+	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/tablet/register';
 }
 eAPI.smile = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/tablet/smile';
+	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/tablet/smile';
 }
 eAPI.rating = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/tablet/rating';
+	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/tablet/rating';
 }
 eAPI.comment= function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/tablet/comment';
+	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/tablet/comment';
 }
 eAPI.info = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/tablet/info';
+	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/tablet/info';
 }
 // api for mobile phone
+eAPI.getDepartment = function(){
+	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/tablet/department?key=-1&langid=2';
+}
 eAPI.getLocation = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/location?id=' + Common.user.user_id;
+	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/location';
 }
-eAPI.getEmployee = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/employee';
-}
-eAPI.getEmployeeCompare = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/employee/compare';
+eAPI.getRoom = function(){
+	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/room';
 }
 eAPI.getSmile = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/smile';
-}
-eAPI.getTrend = function(){
-	return 'http://esmile.e-smile.vn:19094/trend.json';
+	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/smile';
 }
 eAPI.getRating = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/rating/all';
-}
-eAPI.getRatingById = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/rating';
+	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/rating/all';
 }
 eAPI.getSurvey = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/survey/vote';
+	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/survey/vote';
 }
 eAPI.getNotify = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/mobile/notify/all';
+	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/mobile/notify/all';
 }
 eAPI.deleteNotify = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/mobile/notify/delete';
+	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/mobile/notify/delete';
 }
 eAPI.deleteNotifyAll = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/vna/mobile/notify/delete/all';
+	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/mobile/notify/delete/all';
 }
 export default eAPI;

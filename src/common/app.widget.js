@@ -36,7 +36,19 @@ var Widget = {
 					Android.callNative(JSON.stringify(obj));
 				}
 				catch(ex){
-					ELC.TRANSPORTER = -1;
+//					TSM.TRANSPORTER = -1;
+					console.log(ex);
+				}
+			}
+		},
+		callIOS: function(obj){
+			console.log('Call Native ' + JSON.stringify(obj));
+			if(Common.isIOS()){
+				try{
+					window.webkit.messageHandlers.callNative.postMessage(JSON.stringify(obj));
+				}
+				catch(ex){
+//					TSM.TRANSPORTER = -1;
 					console.log(ex);
 				}
 			}

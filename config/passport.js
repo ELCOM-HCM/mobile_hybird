@@ -43,15 +43,15 @@ module.exports = function(passport) {
 	}, function(req, username, password, done) { // callback with username
 													// and password from our
 													// form
-		common.log('Loggin with username ' + username + ' password:' + password);
-		request.post('http://esmile.e-smile.vn:3000/vna/login', {form: {username: username, password: password}}, 
+		console.log('Loggin with username ' + username + ' password:' + password);
+		request.post('http://esmile.e-smile.vn:3001/ecopark/login', {form: {username: username, password: password}}, 
 				function(error, response, body){
 					if(error){
 						return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
 					} else {
 						common.log(body);
 						var data = JSON.parse(body);
-						if(data.status == null){
+						if(data.status){
 							user = {
 									username : username,
 									user_id: data.user_id,

@@ -7,11 +7,8 @@
  */
 var eCommon = {
 		color : ['#1ebfae', '#30a5ff', '#ffb53e', '#c7c700', '#f9243f', '#669999'],
-		user: null
-}
-eCommon.isAndroid = function() {
-	return /Android/i
-			.test(navigator.userAgent) ? !0 : !1
+		user: null,
+		socket: null
 }
 eCommon.drawCircleChart = function(element, data){
 	var _=this;
@@ -29,6 +26,10 @@ eCommon.drawCircleChart = function(element, data){
 		$(element + i).data('easyPieChart').update(percent.toFixed());
 	}
 	 
+}
+eCommon.isAndroid = function() {
+	return /Android/i
+			.test(navigator.userAgent) ? !0 : !1
 }
 /**
  * Reference: https://www.highcharts.com/demo/column-drilldown

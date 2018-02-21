@@ -13,7 +13,7 @@
 .login-screen-content .login-screen-title {
   max-width: 480px;
   margin: 40px auto;
-  color: #fff;
+  color: #058cb3;
 }
 .login-screen-content .list-block .item-title.label {
   width: 15%;
@@ -40,16 +40,19 @@
 }
 .login-screen-content form .thumbnail {
   background: transparent;
+  width: 150px;
   height: 100px;
+  padding: 20px 30px;
   border-top-left-radius: 100%;
   border-top-right-radius: 100%;
   border-bottom-left-radius: 100%;
   border-bottom-right-radius: 100%;
   box-sizing: border-box;
+  margin-left: 25%;
 }
 .login-screen-content form .thumbnail img {
   display: block;
-  width: 100%;
+  width: 100px;
 }
 .login-screen-content form input {
   outline: 0;
@@ -75,5 +78,5 @@
 }
 .login-screen-content form .button.active {
   background: rgba(5, 140, 179, 0.8);
-  color: #fff;
+  color: #058cb3;
 }
