@@ -141,6 +141,7 @@ img.logo {
 }
 #notify .list-block .item-text {
   height: auto;
+  color: #000;
 }
 #notify .list-group {
   margin-top: 0;

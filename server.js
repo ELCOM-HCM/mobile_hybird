@@ -1,8 +1,9 @@
 var path = require('path');
 var express = require('express');
 var app = express();
-var PORT = process.env.PORT || 19090;
-
+var PORT = process.env.PORT || 19094;
+var server = require('http').createServer(app);  
+var io = require('socket.io')(server);
 var flash    = require('connect-flash');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
@@ -11,10 +12,15 @@ var session = require('express-session');
 var passport = require('passport');
 var morgan = require('morgan');
 var common = require('./common');
-var fs = require('fs');
-require('./config/passport')(passport);
+var request = require('request');
+var cors = require("cors");
 
-// using webpack-dev-server and middleware in development environment
+var fs = require('fs');
+var data = [];
+var timer;
+var clients = [];
+require('./config/passport')(passport);
+app.use(cors());
 if(process.env.NODE_ENV !== 'production') {
   var webpackDevMiddleware = require('webpack-dev-middleware');
   var webpackHotMiddleware = require('webpack-hot-middleware');
@@ -27,32 +33,25 @@ if(process.env.NODE_ENV !== 'production') {
 }
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
-
+app.use(express.static(path.join(__dirname, '/')));
 app.use(cookieParser()); // read cookies (needed for auth)
 app.use(morgan('dev')); // log every request to the console
 //required for passport
 app.use(session({ 
-		secret: 'dangtm',
+		secret: 'elcom#@',
 		cookie: { maxAge : 3600000 }
 	})); // session secret
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
 
-app.use('/esmile/hontam', express.static(path.join(__dirname, '/')));
+app.use('/', express.static(path.join(__dirname, '/')));
 app.use(express.static(path.join(__dirname, 'dist')));
 app.use('/styles', express.static(path.join(__dirname, 'src/assets/stylesheets')));
 app.use('/common', express.static(path.join(__dirname, 'src/common')));
 app.use('/model', express.static(path.join(__dirname, 'src/model')));
 app.get('/', function(request, response) {
   response.sendFile(__dirname + '/dist/esmile_mobile.html')
-});
-app.get('/esmile/hontam', function(request, response) {
-   response.sendFile(__dirname + '/dist/esmile_mobile.html')
-});
-
-app.get('/mobile', function(request, response) {
-  response.sendFile(__dirname + '/dist/esmile_mobile_vinpearl.html')
 });
 app.get('/home', isLoggedIn, function(req, res){
 	common.log('Go to home page ' + ' session ID ' + req.sessionID);
@@ -75,7 +74,72 @@ app.post('/login', passport.authenticate('local-login', {
 	failureRedirect : '/login', // redirect back to the signup page if there is an error
 	failureFlash : true // allow flash messages
 }));
-app.listen(PORT, function(error) {
+
+io.sockets.on('connection', function(socket){
+	  common.log('user connect socket >> ' + socket.id);
+	  clients.push({socket_id: socket.id, user_id:'', data:[]});
+	  clearInterval(timer);
+	  timer = setInterval(()=> {
+		  request.get('http://esmile.e-smile.vn:3000/vna/mobile/notify', function(error, response, body){
+			//  console.dir(JSON.parse(body));
+			  if(error){
+				  common.log(error);
+				  return;
+			  }
+			  console.dir(clients);
+			  var isChange = false;
+			  var arrReceive = JSON.parse(body).data;
+			  for(var i = 0; i < clients.length; i++){
+				  clients[i].data = [];
+				  for(var j = 0; j < arrReceive.length; j++){
+					  var user = arrReceive[j].user_id;
+					  if(user.indexOf(clients[i].user_id) >= 0){ 
+						  clients[i].data.push(arrReceive[j]);
+					  }
+				  }
+				  var object = {
+						    "message": "SUCCESS",
+						    "status": "1",
+						    "data": clients[i].data
+				  }
+				  if(clients[i].data.length > 0){
+					  console.log('Send data to ' + clients[i].socket_id);
+					  console.log(object);
+					  io.sockets.connected[clients[i].socket_id].emit('receiveNotify', object);
+				  }
+			  }
+		  });
+	  }, 7000);
+//	  console.dir(clients);
+	  io.sockets.connected[socket.id].emit('receiveSocketID', {socket_id: socket.id}, function(data) {
+		  console.log('Send socket ' + socket.id);
+	  });
+	  socket.on('sendUserID', function (data) {
+		  common.log('Receive userID ');
+		  console.log(data);
+		  var obj = JSON.parse(data);
+		  for(var i = 0; i < clients.length; i++){
+			  if(clients[i].socket_id == obj.socket_id){
+				  clients[i].user_id = obj.user_id;
+			  }
+		  }
+		  
+	  });	  
+	  socket.on('disconnect', function() {
+	        var index = -1;
+	        for(var i = 0; i < clients.length; i++){
+	        	if(clients[i].socket_id == socket.id){
+	        		index = i;
+	        		break;
+	        	}
+	        }
+	        if (index != -1) {
+	            clients.splice(index, 1);
+	            console.info('Client gone (id=' + socket.id + ').');
+	        }
+	  });
+});
+server.listen(PORT, function(error) {
   if (error) {
     console.error(error);
   } else {

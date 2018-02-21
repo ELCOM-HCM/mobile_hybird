@@ -121,7 +121,7 @@ class App extends Component {
 			 _.linearRegresion('Average Customer Experience Trend', '#trend_average', [[1, 9], [2, 15], [3, 17]], '#ff9500');
 			 _.linearRegresion('Poor Customer Experience Trend', '#trend_poor', [[1, 9], [2, 15], [3, 9]], '#ffcc00');
 			 _.linearRegresion('Very Poor Customer Experience Trend', '#trend_verypoor', [[1, 9], [2, 15], [3, 5]], '#ff3b30');
-		})
+		});
 	}
 	linearRegresion(title, id, data, color){
 		$(id).highcharts({
