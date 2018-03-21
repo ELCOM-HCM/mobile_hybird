@@ -1,0 +1,17 @@
+#store .list-block ul {
+  background: transparent;
+}
+#store .list-block ul li {
+  color: #058cb3;
+}
+#store .list-block ul li i {
+  color: #C08E3D;
+}
+#store .list-block ul li .item-title-row {
+  padding-right: 0px;
+  background-image: none;
+}
+#store .list-block ul li .item-subtitle i {
+  font-size: 25px;
+  padding-right: 5px;
+}
