@@ -25,44 +25,53 @@
 		    color: @color-root !important;
 		}
 	}
-	form{
-		  position: relative;
-		  z-index: 1;
-		  background: #fff;
-		  -webkit-box-shadow: 0px 0px 26px -3px @color-root;
-		  -moz-box-shadow: 0px 0px 26px -3px @color-root;
-		  box-shadow: 0px 0px 26px -3px @color-root;
-		  max-width: 300px;
-		  margin: 0 auto 100px;
-		  padding: 10px;
-		  //border: 2px solid @color-active;
-		  border-top-left-radius: 3px;
-		  border-top-right-radius: 3px;
-		  border-bottom-left-radius: 3px;
-		  border-bottom-right-radius: 3px;
-		  text-align: center;
-		  .thumbnail {
+	.thumbnail {
 			  background: transparent;
-			 // width: 150px;
-			  height: 100px;
-			  margin: -75px auto 30px;
-			  padding: 20px 30px;
+//			  width: 150px;
+//			  height: 100px;
+			  text-align: center;
+//			  margin: -75px auto 30px;
+			  padding: 0px 30px;
+			  margin-top: 35%;
 			  border-top-left-radius: 100%;
 			  border-top-right-radius: 100%;
 			  border-bottom-left-radius: 100%;
 			  border-bottom-right-radius: 100%;
 			  box-sizing: border-box;
-			  margin-left: 25%;
+//			  smargin-left: 10%;
+//			  margin-left: -5%;
 			  img {
-				  display: block;
-				  width: 100px;
-//				  border-radius: 35%;
+//				  display: block;
+				  width: 70%;
+//				  border-radius: 35%; 
 				}
+	}
+	form{
+		  position: relative;
+		  z-index: 1;
+		  background: transparent;
+//		  -webkit-box-shadow: 0px 0px 26px -3px @color-root;
+//		  -moz-box-shadow: 0px 0px 26px -3px @color-root;
+//		  box-shadow: 0px 0px 26px -3px @color-root;
+		  max-width: 300px;
+		  margin: 0 auto 100px;
+//		  padding: 10px;
+//		  border: 2px solid @color-active;
+		  border-top-left-radius: 3px;
+		  border-top-right-radius: 3px;
+		  border-bottom-left-radius: 3px;
+		  border-bottom-right-radius: 3px;
+		  text-align: center;
+		.item-inner{
+			background: #f2f2f2 !important
+		}
+		.list-block .item-content{
+			 padding-left: 0px;
 		}
 		input {
 		  outline: 0;
 		  background: #f2f2f2;
-		  width: 100%;
+		  width: 100%; 
 		  border: 0;
 		  margin: 0 0 15px;
 		  padding: 15px;
@@ -79,10 +88,15 @@
 		.button{
 			font-size: 17px;
     		font-weight: bold;
-			border: 1px solid @color-root;		
+			border: 2px solid @color-root;
+			color: #fff;	
 			&.active {
 			    background: fade(@color-root, 80%);
-			    color: @color-text;
+			    color: #fff !important;
+			}
+			&.active-state {
+//			    background: fade(@color-root, 80%);
+			    color: #fff !important;
 			}
 		}
 	}

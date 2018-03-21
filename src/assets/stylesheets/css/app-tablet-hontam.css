@@ -5,7 +5,7 @@
   height: 100%;
   margin: 0;
   padding: 0;
-  background: transparent;
+  background: #C08E3D !important;
 }
 .container-items {
   position: relative;
@@ -101,7 +101,7 @@
   display: table;
 }
 .slide-small .swiper-pagination-progressbar {
-  background: #fff;
+  background: #C08E3D;
 }
 .slide-small img {
   width: 100%;
@@ -155,7 +155,7 @@
 .text-welcome .content-block h3 {
   text-transform: uppercase;
   font-size: 23px;
-  color: #fff;
+  color: #C08E3D;
 }
 .row-item {
   text-align: center;
@@ -175,7 +175,7 @@
 .container-items-p2 h3 {
   text-transform: uppercase;
   font-size: 25px;
-  color: #fff;
+  color: #C08E3D;
   padding-top: 20px;
   text-align: center;
 }
@@ -183,7 +183,7 @@
   margin-top: 15px;
 }
 .container-items-p2 .button.active-state {
-  background: #fff;
+  background: #C08E3D;
 }
 .container-items-p3 {
   height: 100%;
@@ -200,7 +200,7 @@
 .container-items-p3 h3 {
   text-transform: uppercase;
   font-size: 25px;
-  color: #fff;
+  color: #C08E3D;
   padding-top: 20px;
   text-align: center;
 }
@@ -208,7 +208,7 @@
   margin-top: 15px;
 }
 .container-items-p3 .button.active-state {
-  background: #fff;
+  background: #C08E3D;
 }
 .container-items-p4 {
   display: table;
@@ -230,18 +230,18 @@
 .container-items-p4 h3 {
   text-transform: uppercase;
   font-size: 25px;
-  color: #fff;
+  color: #058cb3;
 }
 .button {
   border: 1px solid #C08E3D;
-  color: #fff;
+  color: #C08E3D;
   font-weight: bolder;
   background: #c08e3d !important;
   font-size: 20px;
 }
 @media (min-width: 1024px) {
   .modal {
-    color: #fff;
+    color: #C08E3D;
     width: 415px;
     left: 43%;
   }
@@ -258,7 +258,7 @@
 }
 @media (min-width: 1366px) {
   .modal {
-    color: #fff;
+    color: #C08E3D;
     width: 415px;
     left: 43%;
   }
@@ -380,7 +380,7 @@
   position: absolute;
   margin-left: 70%;
   margin-top: 10px;
-  color: #fff;
+  color: #C08E3D;
 }
 .ripplelink .check_round i {
   font-size: 35px;
@@ -388,7 +388,7 @@
 .ink {
   display: block;
   position: absolute;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(192, 142, 61, 0.8);
   border-radius: 100%;
   -webkit-transform: scale(0);
   -moz-transform: scale(0);

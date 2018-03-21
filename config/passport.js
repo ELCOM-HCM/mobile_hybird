@@ -1,9 +1,10 @@
-// config/passport.js
-
-// load all the things we need
+/**
+ * @author DangTM
+ */
 var LocalStrategy = require('passport-local').Strategy;
 var common = require('../common');
 var request = require('request');
+var db = require('./database');
 var user = {};
 // expose this function to our app using module.exports
 module.exports = function(passport) {
@@ -43,36 +44,20 @@ module.exports = function(passport) {
 	}, function(req, username, password, done) { // callback with username
 													// and password from our
 													// form
-//		common.log('Loggin with username ' + username + ' password:' + password);
-//		if(username == "hontam" && password == "321"){
-//			user = {
-//					username : 'hontam',
-//					fullname : 'MerPerle HonTam'//response.fullname,
-//				}
-//			return done(null, user);
-//		} else {
-//			return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
-//		}
-		
-		request.post('http://hongduc.e-smile.vn:3000/hongduc/login', {form: {username: username, password: password}}, 
-				function(error, response, body){
-					if(error){
-						return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
-					} else {
-						common.log(body);
-						var data = JSON.parse(body);
-						if(data.status == 1){
-							user = {
-									username : username,
-									fullname : data.message,
-								}
-								return done(null, user);
-						} else {
-							return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
-						}
-						
-					}
-	    		});
+		console.log('Loggin with username ' + username + ' password:' + password);
+		db.findUser(username, password, function(result){
+			console.log(result);
+//			if(data.status){
+//				user = {
+//						username : username,
+//						user_id: data.user_id,
+//						fullname : data.name,
+//					}
+//					return done(null, user);
+//			} else {
+//				return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
+//			}
+		});
 	}));
 
 };

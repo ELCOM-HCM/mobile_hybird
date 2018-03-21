@@ -9,11 +9,17 @@
   height: 100%;
   margin: 0px;
   padding: 0px;
-  background: #fff;
+  background: url('/styles/images/bg.jpg') ! important;
+  background-repeat: no-repeat;
+  background-position: bottom;
+  background-size: cover;
 }
 @media (max-width: 736px) {
   .page {
-    background: transparent;
+    background-image: url('/styles/images/bg.jpg');
+    background-repeat: no-repeat;
+    background-position: bottom;
+    background-size: cover;
   }
 }
 .ios-icons {
@@ -56,7 +62,6 @@
   font-style: normal;
   font-weight: 400;
   src: url(../fonts/MaterialIcons-Regular.eot);
-  /* For IE6-8 */
   src: local('Android Icons'), local('MaterialIcons-Regular'), url(../fonts/MaterialIcons-Regular.woff2) format('woff2'), url(../fonts/MaterialIcons-Regular.woff) format('woff'), url(../fonts/MaterialIcons-Regular.ttf) format('truetype');
 }
 .android-icons {
@@ -64,7 +69,6 @@
   font-weight: normal;
   font-style: normal;
   font-size: 24px;
-  /* Preferred icon size */
   display: inline-block;
   line-height: 1;
   text-transform: none;
@@ -72,13 +76,9 @@
   word-wrap: normal;
   white-space: nowrap;
   direction: ltr;
-  /* Support for all WebKit browsers. */
   -webkit-font-smoothing: antialiased;
-  /* Support for Safari and Chrome. */
   text-rendering: optimizeLegibility;
-  /* Support for Firefox. */
   -moz-osx-font-smoothing: grayscale;
-  /* Support for IE. */
   font-feature-settings: 'liga';
 }
 @font-face {
@@ -199,21 +199,18 @@
 .icon-users:before {
   content: '\e813';
 }
-/**
- * customize color
- */
 .tabbar-labels a.tab-link,
 .tabbar-labels a.link {
-  color: #fff;
+  color: #C08E3D;
 }
 .navbar-inner {
-  color: #fff;
+  color: #C08E3D;
 }
 a {
   color: #C08E3D;
 }
 .tabbar a.active {
-  color: #C08E3D !important;
+  color: #C08E3D ! important;
 }
 .active i.home,
 .active i.icons-graph-round,

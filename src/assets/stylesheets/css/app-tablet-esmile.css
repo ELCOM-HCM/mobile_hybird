@@ -18,7 +18,9 @@
   margin-top: 55px;
 }
 .container-items .row_item {
-  width: 100%;
+  margin: 20px;
+  position: absolute;
+  top: 41%;
 }
 .container-items .row_item .esmile-item {
   width: 160px;
@@ -46,10 +48,8 @@
   height: 100%;
 }
 .slide-large.swiper-container img {
+  background-repeat: round;
   height: 100%;
-  background-repeat: no-repeat;
-  background-position: bottom;
-  background-size: cover;
 }
 .button-direct {
   position: absolute;
@@ -97,7 +97,7 @@
   display: table;
 }
 .slide-small .swiper-pagination-progressbar {
-  background: #fff;
+  background: #C08E3D;
 }
 .slide-small img {
   width: 100%;
@@ -105,7 +105,7 @@
 }
 .slide-small h3 {
   text-align: center;
-  color: #fff;
+  color: #C08E3D;
   display: table-cell;
   vertical-align: middle;
   font-size: 23px;
@@ -144,20 +144,22 @@
 .logo img {
   margin: 15px;
   float: right;
-  width: 130%;
 }
 .text-welcome {
+  top: 18%;
+  position: absolute;
   width: 100%;
 }
 .text-welcome .content-block {
   text-align: center;
   width: 100%;
   margin: 20px;
+  background: rgba(255, 255, 255, 0.7);
 }
 .text-welcome .content-block h3 {
   text-transform: uppercase;
-  font-size: 30px;
-  color: #fff;
+  font-size: 23px;
+  color: #C08E3D;
 }
 .row-item {
   text-align: center;
@@ -177,7 +179,7 @@
 .container-items-p2 h3 {
   text-transform: uppercase;
   font-size: 25px;
-  color: #fff;
+  color: #C08E3D;
   padding-top: 20px;
   text-align: center;
 }
@@ -185,7 +187,7 @@
   margin-top: 15px;
 }
 .container-items-p2 .button.active-state {
-  background: #fff;
+  background: #C08E3D;
 }
 .container-items-p3 {
   height: 100%;
@@ -202,7 +204,7 @@
 .container-items-p3 h3 {
   text-transform: uppercase;
   font-size: 25px;
-  color: #fff;
+  color: #C08E3D;
   padding-top: 20px;
   text-align: center;
 }
@@ -210,7 +212,7 @@
   margin-top: 15px;
 }
 .container-items-p3 .button.active-state {
-  background: #fff;
+  background: #C08E3D;
 }
 .container-items-p4 {
   display: table;
@@ -223,23 +225,24 @@
 }
 .container-items-p4 .row .content {
   width: 100%;
-  background: transparent;
+  padding: 10px;
+  background: rgba(192, 142, 61, 0.6);
 }
 .container-items-p4 h3 {
   text-transform: uppercase;
-  font-size: 20px;
-  color: #fff;
+  font-size: 25px;
+  color: #058cb3;
 }
 .button {
   border: 1px solid #C08E3D;
-  color: #fff;
+  color: #C08E3D;
   font-weight: bolder;
   background: #c08e3d !important;
   font-size: 20px;
 }
 @media (min-width: 1024px) {
   .modal {
-    color: #fff;
+    color: #C08E3D;
     width: 415px;
     left: 43%;
   }
@@ -256,7 +259,7 @@
 }
 @media (min-width: 1366px) {
   .modal {
-    color: #fff;
+    color: #C08E3D;
     width: 415px;
     left: 43%;
   }
@@ -272,9 +275,10 @@
   }
   .container-items .row_item {
     margin: 35px;
+    position: absolute;
+    top: 41%;
     left: 0;
     right: 0;
-    width: 100%;
   }
   .container-items .row_item .esmile-item {
     width: 185px;
@@ -377,7 +381,7 @@
   position: absolute;
   margin-left: 70%;
   margin-top: 10px;
-  color: #fff;
+  color: #C08E3D;
 }
 .ripplelink .check_round i {
   font-size: 35px;
@@ -385,7 +389,7 @@
 .ink {
   display: block;
   position: absolute;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(192, 142, 61, 0.8);
   border-radius: 100%;
   -webkit-transform: scale(0);
   -moz-transform: scale(0);

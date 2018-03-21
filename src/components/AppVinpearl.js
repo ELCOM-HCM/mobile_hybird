@@ -1,14 +1,12 @@
 import '../assets/stylesheets/base.scss';
 import '../assets/stylesheets/css/app-tablet-esmile.css';
-import 'react-rater/lib/react-rater.css'
 import React, { Component } from 'react';
 import cookie from "react-cookie";
 import ReactDOM from 'react-dom';
 import app from '.././common/app.plugin';
 import Setting from '.././components/Setting';
+import XMLParser from 'react-xml-parser';
 import eCommon from '.././common/app.common';
-import Rater from 'react-rater';
-import Rating from 'react-rating';
 //import $ from 'jquery';
 
 class AppTablet extends Component{
@@ -21,20 +19,17 @@ class AppTablet extends Component{
 			api_get_content: '/eSurvey/ReceiveRatingCustomer?siteid=2&cmd=0002&lid=2',
 			api_send_rating: '/eSurvey/ReceiveRatingCustomer?cmd=0003&siteid=2&lid=2&p0=[p0]&p1=[p1]',
 			api_send_other: '/eSurvey/ReceiveRatingCustomer?cmd=0005&lid=2&p0=[p0]&siteid=2&text=[text]',
-			logo: '',
+			logo: '/eResource/logo/logo.png',
 			title: 'Share Your Opinion',
 			button: ['Submit', 'Cancel'],
 			btn_popup: ['Send', 'Close'],
 			welcome: [
-			          {id: 1, name: ''},
-			          {id: 2, name: 'BẠN CÓ HÀI LÒNG VỚI WAKE UP 37'},
-			          {id: 3, name: ''},
-			          {id: 4, name: 'XIN TRÂN TRỌNG CẢM ƠN Ý KIẾN ĐÁNH GIÁ CỦA QUÝ KHÁCH'}
+			          {id: 1, name: 'Dear Valued Guest'},
+			          {id: 2, name: 'We appreciate you spending time filling'},
+			          {id: 3, name: 'Please touch the icon to share your feeling'},
+			          {id: 4, name: 'Thank you for your feedback'}
 			],
-			background: [{
-					id: 1,
-					url: "http://103.254.12.200:3119/content/esmile/ask_bg.jpg"
-				}],
+			background: [],
 			text_rating: [
 		           {id: 1, langid: 1, name:'Quý khách đánh giá chung về kì nghỉ ở Vinpearl như thế nào ?'},
 		           {id: 2, langid: 1, name:'Tốc độ thực hiện dịch vụ nhận/trả phòng'},
@@ -61,8 +56,8 @@ class AppTablet extends Component{
 			api_get_content: host + '/eSurvey/ReceiveRatingCustomer?siteid=2&cmd=0002&lid=' + setting.lid,
 			api_send_rating: host + '/eSurvey/ReceiveRatingCustomer?cmd=0003&siteid=2&lid='+ setting.lid+'&p0=[p0]&p1=[p1]',
 			api_send_other: host + '/eSurvey/ReceiveRatingCustomer?cmd=0005&lid='+setting.lid+'&p0=[p0]&siteid=2&text=[text]',
-			logo: "http://103.254.12.200:3119/content/esmile/ask_logo.png",
-			background: [{id: 1 ,url: 'http://' + setting.ip + ":3119/content/esmile/" + 'ask_bg.jpg'}],
+			logo: host + '/eResource/logo/logo.png',
+			backgound: [{id: 1 ,url: 'http://' + setting.ip + ":3119/content/esmile/" + '1492335992763.png'}],
 			smile:[
 			        {id:1, type: 1, name: 'Excellent', url: host + '/eResource/smile/excellent.png', next: 4},
 			        {id:2, type: 1, name: 'Good', url: host + '/eResource/smile/good.png', next: 4},
@@ -86,10 +81,41 @@ class AppTablet extends Component{
 				btn_popup: ['Gửi', 'Đóng'],
 				button: ['Gửi cảm nhận', 'Bỏ qua']
 			});
-		} 
+		} else if(Number(langid) == 2){ // english
+			this.setState({
+				title: 'Share Your Opinion',
+				btn_popup: ['Send', 'Close'],
+				button: ['Submit', 'Cancel']
+			});
+		}  else if(Number(langid) == 3){ // janpanese
+			this.setState({
+				title: 'あなたの意見を共有する',
+				btn_popup: ['送信', '閉じる'],
+				button: ['提出する', 'キャンセル']
+			});
+		}  else if(Number(langid) == 4){ // Korean
+			this.setState({
+				title: '의견 공유',
+				btn_popup: ['보내다', '닫기'],
+				button: ['제출', '취소']
+			});
+		}  else if(Number(langid) == 5){ // Chinese
+			this.setState({
+				title: '分享您的意見',
+				btn_popup: ['發送', '關'],
+				button: ['提交', '取消']
+			});
+		}  else if(Number(langid) == 6){ // Russian
+			this.setState({
+				title: 'Поделитесь своим мнением',
+				btn_popup: ['послать', 'Закрыть'],
+				button: ['Отправить', 'Отмена']
+			});
+		}
 		// get content
 		$.get(this.state.api_get_content + '&langid=' + langid, function(response){
 			var xml = $.parseXML(response);
+			//var xml = new XMLParser().parseFromString(response); 
 			// get logo
 			var xmlNodes = xml.getElementsByTagName('logo');
 			var logo = $(xmlNodes)[0].textContent;
@@ -166,22 +192,27 @@ class AppTablet extends Component{
 				smile: smile
 			});
 			// get background
-//			var node = $(xml).find('background').find('item');
-//			var length = node.length;
-//			var bg = [];
-//			for(var i = 0; i < length; i++){
-//				var obj = {
-//					id: node.find('id')[i].textContent,
-//					url: _.state.host_content + node.find('value')[i].textContent
-//				}
-//				bg.push(obj);
-//			}
+			var node = $(xml).find('background').find('item');
+			var length = node.length;
+			var bg = [];
+			for(var i = 0; i < length; i++){
+				var obj = {
+					id: node.find('id')[i].textContent,
+					url: _.state.host_content + node.find('value')[i].textContent
+				}
+				bg.push(obj);
+			}
+			
+			_.setState({
+				background: bg
+			});
+			
+			
 		});
 	}
 	componentDidMount(){
 		var langid = this.props.langid;
-		//this.initData(langid);
-		
+		this.initData(langid);
 	}
 	changeLanguage(langid){
 		this.initData(langid);
@@ -248,7 +279,6 @@ class Page_1 extends React.Component {
    componentWillReceiveProps(){
    }
    componentDidMount(){
-	   
    }
    itemClick(item, event){
 	   var _= this;
@@ -286,70 +316,52 @@ class Page_1 extends React.Component {
 	   eCommon.rippleEffect($this, event);
 	   this.props.changeLanguage(item.id);
    }
-   handleRate(obj){
-	   console.log(obj.rating); // 
-	   clearTimeout();
-	   var id = 0;
-	   switch(obj.rating){
-	     case 1:
-	    	 id = 5;
-	    	 break;
-	     case 2:
-	    	 id = 3;
-	    	 break;
-	     case 3:
-	    	 id= 2;
-	    	 break;
-	     case 4: 
-	    	 id= 4;
-	    	 break;
-	     case 5: 
-	    	 id= 1;
-	    	 break;
-	   }
-	   setTimeout(function(){
-		   $('.views').find('div[data-page="esmile_page_1"]').addClass('cached');
-		   $('.views').find('div[data-page="esmile_page_4"]').removeClass('cached');
-		   $.ajax({
-			   url:"http://esmile.e-smile.vn:3000/ask/tablet/smile",
-			   type:"POST",
-			   data: {"key":"2077","id":id,"user_id":"47"},
-		   	   success: function(response){
-		   		   console.log(response);   
-		   	   },
-		   	   error: function(){
-		   		   console.log("Fail");
-		   	   }
-		   });
-	   }, 1000);
-   }
    render() {
       return (
     		<div data-page="esmile_page_1" className="page" >
 	          <div className="page-content">
 	             <div className="container-items">
 	             	 <Setting />
-		             <div className="row">
-						  <div className="col-60">
-						  	<h2>{this.props.text[0].name}</h2>
-						  </div>
-						  <div className="col-20 pull-right logo">
-						  	 <img src={this.props.logo}/>
-						  </div>
-					</div>
-					 <div className="row text-welcome">
+		             <div className="row text-welcome">
 			             <div className="content-block">
 			             	<h3>{this.props.text[1].name}</h3>
+			             	<h3>{this.props.text[2].name}</h3>
 			             </div>
 		             </div>
+		             <div className="row">
+					  <div className="col-20 logo">
+					  	 <img src={this.props.logo}/>
+					  </div>
+					  <div className="col-60">
+					  	<h2>{this.props.text[0].name}</h2>
+					  </div>
+					  <div className="col-20 icon-flag">
+					    <div className="row">
+						    {this.props.languages.map(function(item){
+						    	return (
+						    		<div key={item.id} className="col-30">
+						    			<a href="#"  className="ripplelink" ref={"lang__" + item.id} onClick={this.changeLanguage.bind(this, item)} >
+							    			<img src={item.url} />
+						    			</a>
+								    </div>
+						    	);
+						    }, this)}
+					    </div>
+					  </div>
+					</div>
 		             <div className="row row_item">
-		             	{/*<Rater total={5} onRate={this.handleRate.bind(this)}>
-		             	</Rater>*/}
-		             	{/*<Rating
-		             	  emptySymbol="fa fa-star-o fa-2x"
-		             	  fullSymbol="fa fa-star fa-2x"
-		             	/>*/}
+		             	{this.props.smile.map(function(item, index){
+		             		return (
+		             			<div key={item.id + '_' + item.type} className="col-15">
+		             				<a href="#" ref={"item__" + item.id} className="ripplelink item__smile shakeit" onClick={this.itemClick.bind(this, item)}>
+		             					<img className="esmile-item" src= {item.url} />
+		             				</a>
+		             				<a href="#" className="button button-round">{item.name}</a>
+		        	            </div>
+		             		)
+		             	}, this)}
 		             </div>
+		             <Slide_Small logo={this.props.logo} languages={this.state.languages} text={this.props.text_rating}/>
 	             </div>
 	          </div>
 	        </div>
@@ -442,7 +454,7 @@ class Page_4 extends React.Component {
             <div className="page-content container-items-p4">
 		        <div className="row">
 		            <div className="content">
-			            <img src= {this.props.logo} style={{width:"50%"}}/>
+			            <img src= {this.props.logo}/>
 			  	 		<h3>{this.props.text}</h3>
 		            </div>
 		  	 		

@@ -1,11 +1,15 @@
 import '../assets/stylesheets/base.scss';
 import '../assets/stylesheets/css/app-rating.css';
+
 import React, { Component } from 'react';
 import API from '.././common/app.api';
 import ReactDOM from 'react-dom';
 import FWPlugin from '.././common/app.plugin';
 import Common from '.././common/app.common';
 import Login from './Login';
+import Widget from '.././common/app.widget';
+import Header from './Header';
+import Cookie from "react-cookie";
 var $$ = Dom7;
 class App extends Component {
 	constructor(props) {
@@ -17,15 +21,17 @@ class App extends Component {
 			rating:[],
 			smile: [],
 			typeScreen: 0, // 0: Room, 1: Front Desk
+			soundStatus: 1,
 			color : ['#1ebfae', '#30a5ff', '#ffb53e', '#c7c700', '#f9243f', '#669999']
 		}
 	}
-	componentWillMount(){	
+	componentWillMount(){
+		Common.socket = io();
 		Common.request({
 			url: '/checkLogin',
 			type: 'POST'
 		}, function(res){
-			Common.logs(res);
+			Common.logs(res)
 			if(res.status){
 				Common.user = res.user;
 				location.href="/#/home";
@@ -35,38 +41,29 @@ class App extends Component {
 		});
 	}
 	componentDidMount(){
-		var _=this;
-		// initial date
-		var date = Common.getLast30Days();
-		var today = new Date();
-//		$('#date-from').val(moment().subtract('days', 30).format('YYYY-MM-DD')); // get 30 day
-		$('.date-from').val(moment().format('YYYY-MM-DD')); // get today
-		$('.date-to').val(moment().format('YYYY-MM-DD')); // get today
-//		$('#date-from').attr(
-//				   "data-date", 
-//				   moment().subtract('days', 30).format( $('#date-from').attr("data-date-format") ));
-		$('.date-from').attr(
-				   "data-date", 
-				   moment().format( $('.date-from').attr("data-date-format") ));
-		$('.date-to').attr(
-				   "data-date", 
-				   moment().format( $('.date-from').attr("data-date-format") ));
-		_.getRoom();
-//		setInterval(function(){
-//			_.getRoom();
-//		}, 5000);
-
 		
 	}
 	componentWillReceiveProps(newProps){
+		console.log('componentWillReceiveProps');
+		console.log(newProps);
 	}
-	
 	getSmile(eParent, eCircleChart, eColumnChart, text){
 		var _=this;
 		var location = [];
-		$('.list-room input:checkbox').each(function () {
+		var department = _.state.location;
+		$('.list-room input:radio').each(function () {
 			if ($(this).is(':checked')) {
-				location.push($(this).val());
+				let id = $(this).val();
+				for(let i= 0; i < department.length; i++){
+					if(department[i].id == id && id != '-999'){
+//						location.push(department[i].location.find(function(item){
+//							return item;
+//						}).id);
+						for(let j = 0; j < department[i].location.length; j++){
+							location.push(department[i].location[j].id);
+						}
+					}
+				}
 			}
 		 });
 		var from = $('.date-from').attr('data-date');
@@ -77,50 +74,74 @@ class App extends Component {
 				location: location, 
 				lang_id: '2'
 		};
-    	Common.request({data: opt, url: API.getSmile()}, function(res){
-    		var length = res.length;
-    		var rating = [];
-    		// check change data
-//    		if(_.state.rating.length > 0 && length > 0 
-//    			&& res[0].sum == _.state.rating[0].sum){
-//    			return;
-//    		}
-    		for(var i = 0; i < length; i++){
-    			var obj = {
-    				id: res[i].id,
-    				name: res[i].name,
-    				value: Number(res[i].num),
-    				sum: (res[i].sum == 0 ? 1: Number(res[i].sum)),
-    				item:[]
-    			}
-    			rating.push(obj);
-    		}
-    		_.setState({
-    			rating: rating
-    		});
-    	_.drawCircleChart(eCircleChart, rating);
-    	_.drawColumnChart(eColumnChart, rating, text);
-       });
+		Common.socket.emit('request_data', opt);
     }
+	handleRealtime(data){
+		var _=this;
+		var res = JSON.parse(data.smile);
+		var res1 = JSON.parse(data.rating);
+		var length = res.length;
+		var rating = [];
+		var check = 0;
+		for(var i = 0; i < length; i++){
+			var obj = {
+				id: res[i].id,
+				name: res[i].name,
+				value: Number(res[i].num),
+				sum: (res[i].sum == 0 ? 1: Number(res[i].sum)),
+				item:[]
+			}
+			rating.push(obj);
+			if(_.state.rating.length > 0 && _.state.rating[i].value != obj.value){
+				check = 1;
+			}
+		}
+		if(_.state.rating.length > 0 && check == 0){
+			return;
+		}
+//		_.setState({
+//			rating: rating
+//		});
+		//'#frontdesk', '#fd_percent__', 'fd_rating_container', 'RATING'
+		
+		if(res1.length > 0){
+			  var data = res1;
+			  var length = data.length;
+			  for(var i = 0; i < length; i++){
+				  if(i < length){
+					  rating[i].item = data[i].rating;
+				   } else {
+					  // rating[i].item = data[i].comment;
+				   }
+			  }
+			
+		  }
+		 /* if(_.state.rating.length == 0){
+			 _.setState({
+			     rating: rating
+		     });
 	
+		  }*/
+		 
+		  setTimeout(function(){
+			_.drawCircleChart('#fd_percent__', rating);
+			_.drawColumnChart('fd_rating_container', rating, 'RATING');
+		  }, 200);
+		_.setState({
+			  rating: rating
+		  });
+		
+	}
 	drawCircleChart(element, data){
 		var _=this;
 		var length = data.length;
 		for(var i = 0; i < length; i++){
 			var percent = data[i].value*100/data[i].sum; 
 			var classes = data[i].name.toLowerCase().replace(" ", '');
-//			$(element+ ' .text__'+ i).text(data[i].name);
-//			$(element+ ' .percent__'+ i).attr('data-percent', percent.toFixed());
-//			$(element + ' .percent__' + i + ' .percent').text(percent.toFixed() + '%');
-//			$(element + i).easyPieChart({
-//				scaleColor : false,
-//				barColor : this.state.color[i]
-//			});
-//			$(element + i).data('easyPieChart').update(percent.toFixed());
 			$('.text__'+ i).text(data[i].name);
-			$('.percent__'+ i).attr('data-percent', percent.toFixed());
-			$('.percent__' + i + ' .percent').text(percent.toFixed() + '%');
-			$('.percent__' + i).easyPieChart({
+			$(element + i).attr('data-percent', percent.toFixed());
+			$(element + i + ' .percent').text(percent.toFixed() + '%');
+			$(element + i).easyPieChart({
 				scaleColor : false,
 				barColor : this.state.color[i]
 			});
@@ -150,7 +171,7 @@ class App extends Component {
 		    title: {
 		        text: title,
 		        style: {
-		            color: 'rgba(255,255,255,0.8)'
+		            color: '#058cb3'
 		        }
 		    },
 		    subtitle: {
@@ -160,7 +181,7 @@ class App extends Component {
 		        type: 'category',
 		        labels: {
 	                style: {
-	                    color: 'rgba(255,255,255,0.8)'
+	                    color: '#058cb3'
 	                }
 	            }
 		    },
@@ -168,7 +189,7 @@ class App extends Component {
 		        title: {
 		            text: 'Total rated',
 		            style: {
-			            color: 'rgba(255,255,255,0.8)'
+			            color: '#058cb3'
 			        }
 		        }
 
@@ -198,128 +219,203 @@ class App extends Component {
 		    }]
 		});
 	}
-	getRoom(){
+	getDepartment(){
 		var _=this;
-		//FWPlugin.showIndicator();
-		Common.request({type:'GET', url: API.getRoom()}, function(res){
-			var length = res.length;
-			var room = [];
-			for(var i = 0; i < length; i++){
-				var obj = {
-					id: res[i].id,
-					name: res[i].name
-				}
-				room.push(obj);
-			}
-			_.setState({
-				location: room,
-				typeScreen: 0
-			});
-			_.getSmile('#roomrating', '#percent__', 'rating_container', 'RATING FOR ROOM');
-			//FWPlugin.hideIndicator();
-		});
-	}
-	getLocation(){
-		var _=this;
-		//FWPlugin.showIndicator();
-		Common.request({type:'GET', url: API.getLocation()}, function(res){
+		var location = _.state.location;
+		if(location.length > 0){
+			_.getSmile('#frontdesk', '#fd_percent__', 'fd_rating_container', 'RATING');
+			return;
+		}
+		Common.request({type:'GET', url: API.getDepartment()}, function(res){
 			var length = res.length;
 			var location = [];
 			for(var i = 0; i < length; i++){
-				var obj = {
-					id: res[i].id,
-					name: res[i].name
+				if(res[i].id != '-999'){
+					var obj = {
+						id: res[i].id,
+						name: res[i].name,
+						location: res[i].location
+					}
+					location.push(obj);
 				}
-				location.push(obj);
+				
 			}
 			_.setState({
 				location: location,
 				typeScreen: 1
 			});
-			_.getSmile('#frontdesk', '#fd_percent__', 'fd_rating_container', 'RATING FOR FRONT DESK');
-			//FWPlugin.hideIndicator();
+			_.getSmile('#frontdesk', '#fd_percent__', 'fd_rating_container', 'RATING');
 		});
 	}
 	getSearch(){
 		var _ =this;
 		if(_.state.typeScreen == 0){
-			_.getRoom();
+			//_.getRoom();
 		} else if(_.state.typeScreen == 1){
-			_.getLocation();
+			//_.getDepartment();
+			_.getSmile('#frontdesk', '#fd_percent__', 'fd_rating_container', 'RATING');
 		}
 	}
-	getSurvey(){
-    	var _= this;
-    	var location = [];
-    	$('.list-room input:checkbox').each(function () {
-    		if ($(this).is(':checked')) {
-    			location.push($(this).val());
-    		}
-    	 });
-    	var from = $('.date-from').attr('data-date');
-    	var to = $('.date-to').attr('data-date');
-    	var json = {
-    			lang_id: "2",
-    			date_from: from, 
-    			date_to: to, 
-    			location: location 
-    	};
-    	Common.request({url:API.getSurvey(), data: json}, function(res){
-    		var length = res.length;
-    		var data = [];
-    		for(var i = 0; i < length; i++){
-    			var obj = new Object();
-    			 var sum = (Number(res[i].sum) == 0? 1: Number(res[i].sum));
-    			 obj.name = res[i].name;
-    			 obj.id = res[i].id;
-    			 obj.excellent = (Number(res[i].excellent)*100/sum).toFixed() + ' %';
-    			 obj.good = (Number(res[i].good)*100/sum).toFixed() + ' %';
-    			 obj.average = (Number(res[i].average)*100/sum).toFixed() + ' %';
-    			 obj.poor = (Number(res[i].poor)*100/sum).toFixed()+ ' %';
-    			 obj.sum = sum;
-    			 data.push(obj);
-    		}
-    		 _.setState({
-	   			  survey: data
-	   		  });
-    	});
-    }
+  switchSound(){
+	  var _=this;
+	  if(Common.isAndroid()){
+		  Widget.callAndroid({cmd:'get', key:'IS_NOTIFY', value:'', action: 'ELC.getData'});
+		  var time = setInterval(function(){
+				 if(ELC.TRANSPORTER != null){
+					 if(ELC.TRANSPORTER == -1){
+						clearInterval(time);
+						ELC.TRANSPORTER = null;  
+						return;
+					}
+		            clearInterval(time);
+		            var result = ELC.TRANSPORTER;
+		            if(result == "1"){
+		            	Widget.callAndroid({cmd:'set', key:'IS_NOTIFY', value:'0'});
+		            	_.setState({soundStatus: "0"});
+		            } else {
+		            	Widget.callAndroid({cmd:'set', key:'IS_NOTIFY', value:'1'});
+		            	_.setState({soundStatus: "1"});
+		            }
+		            ELC.TRANSPORTER = null;   
+				 } 
+			 }, 1);
+	  }
+  }
+  logout(){
+	  location.href="/#/login";
+		Common.request({type:'POST', url: '/logout'}, function(res){
+			if(res.status){
+				FWPlugin.closeModal('.picker-filter');
+				FWPlugin.closePanel();
+				Cookie.remove("user");
+				FWPlugin.loginScreen('.login-screen');
+			}
+		});
+  }
   render() {
     return (
     	<div style={{'height': '100%'}}>
 	    	<div className="statusbar-overlay"></div>
 		    <div className="panel-overlay"></div>
 		    <div className="panel panel-left panel-reveal">
-		      <div className="content-block">
-		        <p>Left panel content goes here</p>
-		      </div>
-		    </div>
-		    <div className="panel panel-right panel-cover">
-		      <div className="content-block">
-		        <p>Right panel content goes here</p>
-		      </div>
-		    </div>
+			    <div className="content-block">
+			      <p className="icon-user">
+			      	<img style={{width: '100px'}} src="/styles/images/user.png"/>
+			      </p>
+			      <p>
+			      	<i className="fa fa-user-circle" aria-hidden="true"></i>
+			      	<span>ECOPARK</span>
+			      </p>
+			      <p>
+				      <a href="#" onClick={this.switchSound.bind(this)}>
+						<i className={this.state.soundStatus == "0"?"fa fa-bell-slash": "fa fa-bell"} aria-hidden="true"></i>
+						<span>{this.state.soundStatus == "0"?"On Sound":"Off Sound"}</span>
+		  			  </a>
+			      </p>
+			      <p>
+			      	<a href="#" onClick={this.logout.bind(this)}>
+			      		<i className="fa fa-sign-out" aria-hidden="true"></i> 
+			      		<span>Logout</span>
+			      	</a>
+			      </p>
+			    </div>
+	        </div>
 		    <Login />
 		    <div className="views tabs toolbar-through">
-			      <RoomRating color={this.state.color} 
-			      			 rating={this.state.rating} 
-			      			 logo={this.state.logo}
-			      			 getRoom = {this.getRoom.bind(this)}/>
-			      <Picker location={this.state.location} search={this.getSearch.bind(this)}/>
+			      <Picker location={this.state.location} smile={this.getSmile.bind(this, '#frontdesk', '#fd_percent__', 'fd_rating_container', 'RATING')} search={this.getSearch.bind(this)}/>
 			      <FrontDesk color={this.state.color} 
     			 	location={this.state.location} 
     			 	logo={this.state.logo}
 			      	rating={this.state.rating} 
-		      		getLocation={this.getLocation.bind(this)} />
-			      <Survey logo={this.state.logo} room={this.state.room} survey={this.state.survey} location={this.state.location} getSurvey={this.getSurvey.bind(this)}/>
+		      		getLocation={this.getDepartment.bind(this)} />
+			      <RatingDetail color={this.state.color} logo={this.state.logo} rating={this.state.rating} />
 			      <Notify logo={this.state.logo}/>
-			      <Tabbar getRoom={this.getRoom.bind(this)} getLocation={this.getLocation.bind(this)} getSurvey = {this.getSurvey.bind(this)}/>
+			      <Tabbar  getLocation={this.getDepartment.bind(this)}/>
 			</div>
     	</div>
     )
   }
 };
-
+class RatingDetail extends React.Component {
+    constructor(props) {
+    	super(props);
+    	this.state = {
+    	    rating:[]
+    	}
+	}
+    componentWillMount(){
+    	
+    }
+    openPicker(){
+    	FWPlugin.pickerModal('.picker-filter');
+    }
+    
+    componentDidMount(){
+    	var _=this;
+    	setTimeout(function(){
+    		var data = _.props.rating;
+        	var length = data.length;
+    		for(var i = 0; i < length; i++){
+    			var element = '#rating__percent__'+ i;
+    			var percent = data[i].value*100/data[i].sum; 
+    			$(element+ ' .text__'+ i).text(data[i].name);
+    			$(element+ ' .percent__'+ i).attr('data-percent', percent.toFixed());
+    			$(element + ' .percent__' + i).text(percent.toFixed() + '%');
+    			$(element).easyPieChart({
+    				scaleColor : false,
+    				barColor : _.props.color[i]
+    			});
+    			$(element).data('easyPieChart').update(percent.toFixed());
+    		}
+    	},2000);
+    	
+    }
+  
+   render() {
+      return (
+    		  <div id="rating_detail" className="view tab">
+    		    <Header name="DETAIL RATING" logo={this.props.logo}/>
+    			<div className="pages"> 
+    				<div data-page="rating" className="page">
+    					<div className="page-content rating_container">
+	    					{this.props.rating.map(function(item, index){
+								return (
+									<div key={"rating_detail__" + index} className="row">
+				    			       	  <div className="col-30">
+				    			       	  	  <div className={"easypiechart percent__" + index} id={"rating__percent__" + index} 
+				    			       	  	  		data-percent={(item.value*100/item.sum).toFixed()}>
+				    								<span className="percent">{(item.value*100/item.sum).toFixed() + ' %'}</span>
+				    								<span className={"text__" + index}>{item.name}</span>
+				    						  </div>
+				    			       	  </div>
+				    			       	  <div className="col-70">
+				    			       	  <div className="list-block media-list">	
+		    			       	  			 <ul>
+						    			       	{this.props.rating[index].item.map(function(subItem, idex){
+				    								return (
+				    										<li key={subItem.value + "__" + idex} className="item-content">
+				    								          <div className="item-inner">
+				    								        	  <div className="item-title-row">
+				    								              <div className="item-title">{subItem.name}</div>
+				    								              <div className={"item-after percent__" + idex}>{subItem.num}</div>
+				    								        	  </div>
+				    								          </div>
+				    								        </li>	
+				    								);
+				    							})}
+						    			       	</ul>
+						    			      </div>
+				    			       	  </div>
+				    			       </div>
+								);
+							}, this)}
+    					</div>
+    				</div>
+    			</div>
+    		</div>
+      );
+   }
+}
 class RoomRating extends React.Component{
 	constructor(props) {
 		super(props);
@@ -360,10 +456,6 @@ class RoomRating extends React.Component{
 				<div className="pages navbar-through">
 					<div className="page" data-page="dashboard">
 						<div className="page-content pull-to-refresh-room" data-ptr-distance="50">
-							<div className="pull-to-refresh-layer">
-								<div className="preloader"></div>
-								<div className="pull-to-refresh-arrow"></div>
-							</div>
 							<div className="content-block">
 								<div className="row">
 								    {this.props.rating.map(function(item, index){
@@ -398,12 +490,6 @@ class FrontDesk extends React.Component{
     componentWillMount(){
     }
     componentDidMount(){
-    	var _ =this; 
-		var ptrContent = $$('.pull-to-refresh-frondesk');
-		FWPlugin.initPullToRefresh(ptrContent) ;
-		ptrContent.on('ptr:refresh', function (e) {
-			_.props.getLocation();
-		});
     }
     openPicker(){
     	FWPlugin.pickerModal('.picker-front-desk');
@@ -413,27 +499,12 @@ class FrontDesk extends React.Component{
     }
 	render() {
 		return(
-			<div id="frontdesk" className="view view-main tab">
-				<div className="navbar">
-					<div data-page="frontdesk" className="navbar-inner">
-						<div className="left sliding">
-							<img className="logo" src={this.props.logo} />
-						</div>
-						<div className="center">RATING FOR FRONT DESK</div>
-						<div className="right">
-							<a href="#" className="link icon-only open-picker" onClick={this.openPicker.bind(this)}> <i
-								className="ios-icons">more_vertical</i></a>
-						</div>
-					</div>
-				</div>
+			<div id="frontdesk" className="view view-main tab active">
+			<Header name="RATING" logo={this.props.logo}/>
 				{/*<!-- Pages-->*/}
-				<div className="pages navbar-through">
+				<div className="pages">
 					<div className="page" data-page="dashboard">
 						<div className="page-content pull-to-refresh-frondesk" data-ptr-distance="50">
-							<div className="pull-to-refresh-layer">
-								<div className="preloader"></div>
-								<div className="pull-to-refresh-arrow"></div>
-							</div>
 							<div className="content-block">
 								<div className="row">
 								    {this.props.rating.map(function(item, index){
@@ -544,28 +615,67 @@ class Notify extends React.Component {
 		}
 	}
     componentWillMount(){
-		this.checkNotify();
+//		this.checkNotify();
     }
     componentDidMount(){
-    	this.checkNotify();
-    	setInterval(this.checkNotify.bind(this), 5000);
+    	var _=this;
+    	Common.socket.on('receiveNotifyAll', (res)=>{
+    		var notifications = [];
+			if(res.status == 0){
+				
+			}
+			var data = res.data || [];
+			var length = data.length;
+			var open = 0;
+			for(var i = 0; i < length; i++){
+				var obj = {
+					id: data[i].id,
+					name: data[i].name,
+					location: data[i].location_name,
+					department: data[i].speciality_name
+				}
+				if(obj.status == 0){
+					open++;
+				}
+				notifications.push(obj);
+			}
+			if(notifications.length > 0){
+				_.setState({
+					notifications: notifications
+				});
+			} else {
+				_.setState({
+					notifications:[{id: '-1', name: 'No content', location: "", department: ""}]
+				});
+			}
+			if(open > 0){
+				$('.toolbar a[href="#notify"] i span').text(open);
+				$('.toolbar a[href="#notify"] i span').removeClass("hidden");
+			} else {
+				$('.toolbar a[href="#notify"] i span').addClass('hidden');
+			}
+    	});
+//    	this.checkNotify();
+//    	setInterval(this.checkNotify.bind(this), 5000);
     }
     checkNotify(){
     	Common.request({url:API.getNotify()}, function(res){
 			var notifications = [];
-			var length = res.length;
+			if(!res.status){
+				this.setState({
+					notifications:[{id: '-1', name: 'No content', location: "", department: ""}]
+				});
+				return;
+			}
+			var data = res.data;
+			var length = data.length;
 			var open = 0;
 			for(var i = 0; i < length; i++){
 				var obj = {
-					id: res[i].id,
-					name: res[i].name,
-					status: res[i].status,
-					time: res[i].time,
-					location: res[i].location,
-					checkin: res[i].checkin,
-					checkout: res[i].checkout,
-					guest: res[i].guest,
-					room: res[i].folio
+					id: data[i].id,
+					name: data[i].name,
+					location: data[i].location_name,
+					department: data[i].speciality_name
 				}
 				if(obj.status == 0){
 					open++;
@@ -578,7 +688,7 @@ class Notify extends React.Component {
 				});
 			} else {
 				this.setState({
-					notifications:[{id: '-1', name: 'No content', time: '', status: '1', location: "", guest: "", room:"", checkin:"", checkout:""}]
+					notifications:[{id: '-1', name: 'No content', location: "", department: ""}]
 				});
 			}
 			if(open > 0){
@@ -596,7 +706,7 @@ class Notify extends React.Component {
 		var $this = ReactDOM.findDOMNode(this.refs["noty__" + item.id]);
 		var arr = [];
 		arr.push(item.id);
-		FWPlugin.confirm('Are you sure?', 'eHotel SUP MerPerle', function () {
+		FWPlugin.confirm('Are you sure?', 'eSMILE SUPERVISOR', function () {
 	   		var obj = {
 	   			id: arr
 	   	  };
@@ -609,28 +719,15 @@ class Notify extends React.Component {
 		});
 	}
     rederHtml(obj){
-//		var badge = <span className="badge bg-yellow">{obj.type}</span>;
     	var badge = <span className="badge color-green"></span>;
-    	var time = <div className="item-text">
-						<i className="fa fa-calendar" aria-hidden="true"></i> {obj.time}
-					</div>;
     	var location = <div className="item-text">
 							<i className="fa fa-map-marker" aria-hidden="true"></i> {obj.location}
-				       </div>;
-		var guest = <div className="item-text">
-						<i className="fa fa-user" aria-hidden="true"></i> {obj.guest}
-				     </div>;
-		var room =  <div className="item-text">
-				    	<i className="fa fa-home" aria-hidden="true"></i> {obj.room}
-				    </div>	;	     
-    	var checkin =  <div className="item-text">
-					    	<i className="fa fa-sign-in" aria-hidden="true"></i> {obj.checkin}
-					    </div>;
-		var checkout = <div className="item-text">
-				    	 <i className="fa fa-sign-out" aria-hidden="true"></i> {obj.checkout}
-				       </div>;
+						</div>;
+		var department =  <div className="item-text">
+					    	<i className="fa fa-home" aria-hidden="true"></i> {obj.department}
+					      </div>;	     
 		if(obj.status == 1){
-    		badge = <span className="badge"></span>;
+    		badge = <span className="badge"></span> 
     	}
 		var swipeout = <a href="#" ref="delete_click" onClick={this.deleteClick.bind(this, obj)} 
 						data-index={obj.index} className="bg-red e-delete">Delete</a>;
@@ -649,13 +746,8 @@ class Notify extends React.Component {
 								{badge}
 				          </div>
 				        </div>
-						
-						{obj.time != "" ? time : ""}
+				        {obj.department != "" ? department : ""}
 						{obj.location != "" ? location : ""}
-						{obj.guest != "" ? guest : ""}
-				        {obj.room != "" ? room : ""}
-				        {obj.checkin != "" ? checkin: ""}
-				        {obj.checkout != ""?checkout:""}
 				      </div>
 				    </a>
 				  </div>
@@ -664,14 +756,14 @@ class Notify extends React.Component {
 				  </div>
 				</li>;
 		return (tmp);
-	};
+	}
 	checkAll(){
 		
 	}
 	deleteAll(){
 		var _=this;
 		var arr = [];
-		FWPlugin.confirm('Are you sure delete all?', 'eHotel SUP MerPerle', function () {
+		FWPlugin.confirm('Are you sure delete all?', 'eSMILE SUPERVISOR', function () {
 			var notify = _.state.notifications
 			for(var i = 0;i < notify.length; i++){
 				arr.push(notify[i].id);
@@ -686,6 +778,7 @@ class Notify extends React.Component {
 		 });
 		});
 	}
+	
 	render(){
 		return (
 			<div id="notify" className="view tab">
@@ -694,23 +787,15 @@ class Notify extends React.Component {
 		            <div className="navbar">
 			          <div data-page="notify" className="navbar-inner">
 			            <div className="left sliding">
-			            	<img className="logo" src={this.props.logo} />
+					         <a href="#" data-panel="left" className="open-panel">
+								<img className="logo" src={this.props.logo} />
+							</a>
 			            </div>
 			            <div className="center sliding">NOTIFICATIONS</div>
 			            <div className="right">
 				            <a href="#" onClick={this.deleteAll.bind(this)} className="tab-link"> <i
-									className="ios-icons">trash</i> </a>
-				           {/* <div className="toolbar tabbar tabbar-labels">
-								<div className="toolbar-inner">
-									<a href="#" onClick={this.checkAll.bind(this)} className="tab-link"> 
-										<i className="ios-icons">circle</i>
-										<span className="tabbar-label">Select all</span></a>
-									
-									<a href="#"
-										className="tab-link"> <i className="ios-icons">redo</i><span
-										className="tabbar-label">Cancel</span></a>
-								</div>
-							</div>*/}
+									className="ios-icons color-red">trash</i> </a>
+				          
 			            </div>
 			          </div>
 			        </div>
@@ -728,15 +813,18 @@ class Notify extends React.Component {
 	}
 }
 class Picker extends React.Component{
+	constructor(props){
+		super(props);
+		this.state = {
+			selectIndex: 0
+		}
+	}
 	openPicker(){
     	
     }
     pickerClose(){
     	this.props.search();
     }
-    constructor(props) {
-		super(props);   
-	}
     componentWillMount(){
     }
     componentDidMount(){
@@ -745,23 +833,14 @@ class Picker extends React.Component{
     	    searchIn: '.item-title'
     	});   
     }
-    searchChange(){
-    	if($('#checkbox-all').is(':checked')){
-    		$('.list-room input:checkbox').each(function () {
-    			if ($(this).is(':checked')) {
-    				$(this).attr('checked', false);
-    			}
-    		 });
-    	} else {
-//    		$("input:checkbox").attr("checked",true);
-//    		$('.list-room li').trigger('click');
-//    		$('.list-room input:checkbox').each(function () {
-//    			if (!$(this).is(':checked')) {
-//    				$(this).attr('checked', true).change();
-//    			}
-//    			$(this).attr('checked', true)
-//    		 });
-    	}
+    departmentChanged(){
+    	var _=this;
+    	$('.list-room input:radio').each(function(index, item) {
+			if ($(this).is(':checked')) {
+				_.setState({selectIndex: index});
+			}
+		});
+    	this.props.smile();
     }
 	render(){
 		return(
@@ -769,16 +848,9 @@ class Picker extends React.Component{
 			<div className="toolbar">
 				<div className="toolbar-inner">
 					<div className="left">
-						{/*<label className="label-checkbox item-content" onClick={this.searchChange.bind(this)}>
-							<input type="checkbox" id="checkbox-all" defaultChecked name="checkbox-all" />
-							<div className="item-media">
-								<i className="icon icon-form-checkbox"></i>
-						     </div>
-							<div className="item-inner" style={{float:'right', marginTop:'-22px', marginLeft:'30px'}}>select all</div>
-						</label> */}
 					</div>
 					<div className="right">
-						<a href="#" className="close-picker" onClick={this.pickerClose.bind(this)}>Done</a>
+						<a href="#" className="close-picker">Done</a>
 					</div>
 				</div>
 			</div>
@@ -797,14 +869,11 @@ class Picker extends React.Component{
 				</div>
 				<div className="list-block list-block-search searchbar-found">
 					<ul className="list-room">
-						{this.props.location.map(function(item){
+						{this.props.location.map(function(item, idx){
 							return(
-								<li key={'picker__' + item.id}>
-								  <label className="label-checkbox item-content">
-									     <input type="checkbox" name="room-checkbox" defaultChecked value={item.id} />
-									     <div className="item-media">
-									       <i className="icon icon-form-checkbox"></i>
-									     </div>
+								<li key={'picker__' + item.id} onClick={this.departmentChanged.bind(this)}>
+								  <label className="label-radio item-content">
+									     <input type="radio" name="department-radio" defaultChecked={idx== this.state.selectIndex?'checked':''} value={item.id} />
 									     <div className="item-inner">
 									       <div className="item-title">{item.name}</div>
 									     </div>
@@ -854,12 +923,6 @@ class Tabbar extends React.Component {
    getLocation(){
 	   this.props.getLocation();
    }
-   getRoom(){
-	   this.props.getRoom();
-   }
-   getSurvey(){
-	  this.props.getSurvey();
-   }
    getNotify(){
 	   this.props.getNotify();
    }
@@ -867,17 +930,14 @@ class Tabbar extends React.Component {
       return (
     		 <div className="toolbar tabbar tabbar-labels">
 				<div className="toolbar-inner">
-					<a href="#roomrating" onClick={this.getRoom.bind(this)} className="tab-link active"> <i
-						className="ios-icons">star_fill</i><span
-						className="tabbar-label">Room</span></a>
-					<a href="#frontdesk" onClick={this.getLocation.bind(this)} className="tab-link"> 
+					<a href="#frontdesk" onClick={this.getLocation.bind(this)} className="tab-link active"> 
 						<i className="fa fa-smile-o" style={{fontSize: '27px'}} aria-hidden="true"></i>
-						<span className="tabbar-label">Front Desk</span></a>
-					<a href="#survey" onClick={this.getSurvey.bind(this)} className="tab-link"> <i
-						className="ios-icons">favorites_fill</i> <span className="tabbar-label">Survey</span></a>
+						<span className="tabbar-label">RATING</span></a>
+					<a href="#rating_detail" onClick={this.getLocation.bind(this)} className="tab-link"> <i
+						className="ios-icons">favorites_fill</i> <span className="tabbar-label">DETAIL RATING</span></a>
 					<a href="#notify"
 						className="tab-link"> <i className="ios-icons icons-bell">bell_fill<span className="badge bg-red hidden">0</span></i><span
-						className="tabbar-label">Notifications</span></a>
+						className="tabbar-label">NOTIFICATION</span></a>
 				</div>
 			</div>
       );

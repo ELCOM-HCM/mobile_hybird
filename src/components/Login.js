@@ -11,8 +11,7 @@ import Cookie from "react-cookie";
 import FWPlugin from ".././common/app.plugin";
 import ReactDOM from "react-dom";
 import Common from  ".././common/app.common";
-//import {Link} from 'react-router-dom';
-//import Widget from '.././common/app.widget';
+
 class Login extends React.Component{
 	constructor(props) {
 		super(props);
@@ -49,12 +48,9 @@ class Login extends React.Component{
 					Cookie.save("user", JSON.stringify({username: username, password: password}), {expires: date});
 				}
 				Common.user = res.user;
-//				location.reload();
-//				location.href="/#/home";
-				FWPlugin.closeModal('.login-screen');
 			} else {
 				FWPlugin.modal({
-					title: 'eHotel SUP MerPerle',
+					title: 'eSMILE PORTAL',
 					text: '<p class="color-red"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> LOGIN FAIL</p>', 
 					buttons: [
 					     {text: '<span class="color-red"><i class="ios-icons">close</i> close</span>', bold: true}
@@ -66,14 +62,13 @@ class Login extends React.Component{
 	}
 	render(){
 		return(
-			<div className="login-screen">
+			<div>
 				<div data-page="login-screen" className="page no-navbar no-toolbar no-swipeback">
 				  <div className="page-content login-screen-content">
-				    <div className="login-screen-title">eHotel SUP MerPerle</div>
-				    <form>
-				      <div className="thumbnail">
+				    <div className="thumbnail">
 				      	<img src="/styles/images/logo.png" />
-				      </div>
+				     </div>
+				    <form>
 				      <div className="list-block">
 				        <ul>
 				          <li className="item-content">
@@ -102,7 +97,7 @@ class Login extends React.Component{
 				        <ul>
 				          <li>
 				          	<p>
-				          		<a href="#" onClick={this.login.bind(this)} className="button button-round active"><i className="ios-icons">login</i> Login</a>
+				          		<a href="#" onClick={this.login.bind(this)} className="button button-round button-big"><i className="ios-icons">login</i> LOGIN</a>
 				          	</p>  
 				          </li>
 				        </ul>
