@@ -66,7 +66,7 @@ class Login extends React.Component{
 				<div data-page="login-screen" className="page no-navbar no-toolbar no-swipeback">
 				  <div className="page-content login-screen-content">
 				    <div className="thumbnail">
-				      	<img src="/styles/images/logo.png" />
+				      	<img src="styles/images/logo.png" />
 				     </div>
 				    <form>
 				      <div className="list-block">

@@ -34,8 +34,7 @@ const Database = function(){
 				  "role": userObject.role,
 				  "logo": userObject.logo,
 				  "date": new Date()
-				}
-			).then(function(result){
+				}).then(function(result){
 				callback(result);
 			})
 		});

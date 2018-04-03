@@ -1,8 +1,9 @@
 var path = require('path');
 var express = require('express');
 var app = express();
+var router = express.Router();
 var PORT = process.env.PORT || 19094;
-var server = require('http').createServer(app);  
+var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var flash    = require('connect-flash');
 var bodyParser = require('body-parser');
@@ -16,19 +17,9 @@ var request = require('request');
 var fs = require('fs');
 var data = [];
 var timer = 0;
+var esmile_portal = require('./esmile-portal');
 require('./config/passport')(passport);
 
-// using webpack-dev-server and middleware in development environment
-if(process.env.NODE_ENV !== 'production') {
-  var webpackDevMiddleware = require('webpack-dev-middleware');
-  var webpackHotMiddleware = require('webpack-hot-middleware');
-  var webpack = require('webpack');
-  var config = require('./webpack.config');
-  var compiler = webpack(config);
-  
-  app.use(webpackDevMiddleware(compiler, { noInfo: true, publicPath: config.output.publicPath }));
-  app.use(webpackHotMiddleware(compiler));
-}
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
@@ -45,19 +36,36 @@ app.use(flash()); // use connect-flash for flash messages stored in session
 
 app.use(express.static(path.join(__dirname, '/')));
 app.use(express.static(path.join(__dirname, 'dist')));
+if(process.env.NODE_ENV !== 'production') {
+	var webpackDevMiddleware = require('webpack-dev-middleware');
+	var webpackHotMiddleware = require('webpack-hot-middleware');
+	var webpack = require('webpack');
+	var config = require('./webpack.config');
+	var compiler = webpack(config);
+	
+	app.use(webpackDevMiddleware(compiler, { noInfo: true, publicPath: config.output.publicPath }));
+	app.use(webpackHotMiddleware(compiler));
+}
+app.use(express.static(path.join(__dirname, '/')));
+app.use(express.static(path.join(__dirname, 'dist')));
 app.use('/styles', express.static(path.join(__dirname, 'src/assets/stylesheets')));
 app.use('/common', express.static(path.join(__dirname, 'src/common')));
 app.use('/model', express.static(path.join(__dirname, 'src/model')));
 app.get('/', function(request, response) {
   response.sendFile(__dirname + '/dist/esmile_mobile.html');
 });
-app.get('/esmile/elcom', function(request, response) {
-   response.sendFile(__dirname + '/dist/esmile_mobile.html')
+app.get('/log4j',function(req,res){
+	  var ip = req.headers['x-forwarded-for'] ||
+	  req.connection.remoteAddress ||
+	  req.socket.remoteAddress ||
+	  req.connection.socket.remoteAddress;
+	  console.log(common.getDateTime(), 'Request by IP', ip);
+	  // get parameter
+	  var data = req.query.data;
+	  console.log(common.getDateTime(), "Param data >>",data);
+	  res.send("Server received message");	  
 });
 
-app.get('/mobile', function(request, response) {
-  response.sendFile(__dirname + '/dist/esmile_mobile_vinpearl.html')
-});
 app.get('/home', isLoggedIn, function(req, res){
 	common.log('Go to home page ' + ' session ID ' + req.sessionID);
 	res.send({status: 1, message: 'Success', user: req.user});
@@ -87,32 +95,7 @@ app.post('/logout', function(req, res){
 });
 io.sockets.on('connection', function(socket){
 	  common.log('user connect socket');
-	  clearInterval(timer);
-	  timer = setInterval(()=>{
-		  request.get('http://hongduc.e-smile.vn:3000/hongduc/mobile/notify/', function(error, response, body){
-			  if(error){
-				  console.error(error);
-				  return;
-			  }
-			 // console.dir(JSON.parse(body));
-			  var isChange = false;
-			 // var arrReceive = JSON.parse(body).data;
-			 // if(data.length == arrReceive.length && data.every(function(element, i){
-			//	  return is(element, arrReceive[i])
-			 // })){
-				  io.sockets.emit('receiveNotify', JSON.parse(body));
-			//  } else {
-			//	  console.log('Notify not change');
-			 // }
-		  });
-		  request.get('http://hongduc.e-smile.vn:3000/hongduc/mobile/notify/all', function(error, response, body){
-			  if(error){
-				  console.error(error);
-				  return;
-			  }
-			  io.sockets.emit('receiveNotifyAll', JSON.parse(body));
-		  });
-	  }, 7000);
+	  
 	  socket.on('request_data', function(data){
 		  console.log(data);
 		  request({url:'http://hongduc.e-smile.vn:3000/hongduc/smile', qs: data}, (err, response, body)=>{
@@ -129,6 +112,18 @@ io.sockets.on('connection', function(socket){
 		 console.log('socket.io is disconnected');
 	  });
 });
+//Make io accessible to our router
+app.use('/portal', esmile_portal);
+app.use(function(req,res,next){
+    req.io = io;
+    next();
+});
+
+//Handle 404 error.
+//The last middleware.
+app.use("*",function(req,res){
+	res.status(404).sendFile(path.join(__dirname, '404/404.html'));
+});
 server.listen(PORT, function(error) {
   if (error) {
     console.error(error);
@@ -136,32 +131,7 @@ server.listen(PORT, function(error) {
     console.info(">> Server listening on port %s. Visit http://localhost:%s/ in your browser.", PORT, PORT);
   }
 });
-app.get('/log4j',function(req,res){
-	  var ip = req.headers['x-forwarded-for'] ||
-	  req.connection.remoteAddress ||
-	  req.socket.remoteAddress ||
-	  req.connection.socket.remoteAddress;
-	  console.log(getDateTime(), 'Request by IP', ip);
-	  // get parameter
-	  var data = req.query.data;
-	  console.log(getDateTime(), "Param data >>",data);
-	  res.send("Server received message");	  
-});
-function getDateTime() {
-    var date = new Date();
-    var hour = date.getHours();
-    hour = (hour < 10 ? "0" : "") + hour;
-    var min  = date.getMinutes();
-    min = (min < 10 ? "0" : "") + min;
-    var sec  = date.getSeconds();
-    sec = (sec < 10 ? "0" : "") + sec;
-    var year = date.getFullYear();
-    var month = date.getMonth() + 1;
-    month = (month < 10 ? "0" : "") + month;
-    var day  = date.getDate();
-    day = (day < 10 ? "0" : "") + day;
-    return day + "/" + month + "/" + year + " " + hour + ":" + min + ":" + sec;
-}
+
 function isLoggedIn(req, res, next) {
 	// if user is authenticated in the session, carry on
 	console.log('__________>> isLoggedIn ', req.isAuthenticated());
