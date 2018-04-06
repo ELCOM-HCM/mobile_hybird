@@ -5,7 +5,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var common = require('../common');
 var request = require('request');
 var user = {};
-// expose this function to our app using module.exports
+
 module.exports = function(passport) {
 
 	// =========================================================================

@@ -9,17 +9,23 @@
   height: 100%;
   margin: 0px;
   padding: 0px;
-  background: url('/styles/images/bg.jpg') ! important;
+  background-image: url('/styles/images/bg.jpg');
   background-repeat: no-repeat;
   background-position: bottom;
   background-size: cover;
+  height: 100vh;
+  position: relative;
+  overflow: auto;
 }
 @media (max-width: 736px) {
   .page {
-    background-image: url('/styles/images/bg.jpg');
-    background-repeat: no-repeat;
-    background-position: bottom;
-    background-size: cover;
+      background-image: url('/styles/images/bg.jpg');
+	  background-repeat: no-repeat;
+	  background-position: bottom;
+	  background-size: cover;
+	  height: 100vh;
+	  position: relative;
+	  overflow: auto;
   }
 }
 .ios-icons {

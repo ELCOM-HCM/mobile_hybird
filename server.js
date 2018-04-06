@@ -38,9 +38,9 @@ app.use(cookieParser()); // read cookies (needed for auth)
 app.use(morgan('dev')); // log every request to the console
 //required for passport
 app.use(session({ 
-		secret: 'elcom#@',
-		cookie: { maxAge : 3600000 }
-	})); // session secret
+	secret: 'elcom#@',
+	cookie: { maxAge : 3600000 }
+})); // session secret
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
@@ -75,70 +75,7 @@ app.post('/login', passport.authenticate('local-login', {
 	failureFlash : true // allow flash messages
 }));
 
-io.sockets.on('connection', function(socket){
-	  common.log('user connect socket >> ' + socket.id);
-	  clients.push({socket_id: socket.id, user_id:'', data:[]});
-	  clearInterval(timer);
-	  timer = setInterval(()=> {
-		  request.get('http://esmile.e-smile.vn:3000/vna/mobile/notify', function(error, response, body){
-			//  console.dir(JSON.parse(body));
-			  if(error){
-				  common.log(error);
-				  return;
-			  }
-			  console.dir(clients);
-			  var isChange = false;
-			  var arrReceive = JSON.parse(body).data;
-			  for(var i = 0; i < clients.length; i++){
-				  clients[i].data = [];
-				  for(var j = 0; j < arrReceive.length; j++){
-					  var user = arrReceive[j].user_id;
-					  if(user.indexOf(clients[i].user_id) >= 0){ 
-						  clients[i].data.push(arrReceive[j]);
-					  }
-				  }
-				  var object = {
-						    "message": "SUCCESS",
-						    "status": "1",
-						    "data": clients[i].data
-				  }
-				  if(clients[i].data.length > 0){
-					  console.log('Send data to ' + clients[i].socket_id);
-					  console.log(object);
-					  io.sockets.connected[clients[i].socket_id].emit('receiveNotify', object);
-				  }
-			  }
-		  });
-	  }, 7000);
-//	  console.dir(clients);
-	  io.sockets.connected[socket.id].emit('receiveSocketID', {socket_id: socket.id}, function(data) {
-		  console.log('Send socket ' + socket.id);
-	  });
-	  socket.on('sendUserID', function (data) {
-		  common.log('Receive userID ');
-		  console.log(data);
-		  var obj = JSON.parse(data);
-		  for(var i = 0; i < clients.length; i++){
-			  if(clients[i].socket_id == obj.socket_id){
-				  clients[i].user_id = obj.user_id;
-			  }
-		  }
-		  
-	  });	  
-	  socket.on('disconnect', function() {
-	        var index = -1;
-	        for(var i = 0; i < clients.length; i++){
-	        	if(clients[i].socket_id == socket.id){
-	        		index = i;
-	        		break;
-	        	}
-	        }
-	        if (index != -1) {
-	            clients.splice(index, 1);
-	            console.info('Client gone (id=' + socket.id + ').');
-	        }
-	  });
-});
+
 server.listen(PORT, function(error) {
   if (error) {
     console.error(error);
@@ -151,27 +88,13 @@ app.get('/log4j',function(req,res){
 	  req.connection.remoteAddress ||
 	  req.socket.remoteAddress ||
 	  req.connection.socket.remoteAddress;
-	  console.log(getDateTime(), 'Request by IP', ip);
+	  console.log(common.getDateTime(), 'Request by IP', ip);
 	  // get parameter
 	  var data = req.query.data;
-	  console.log(getDateTime(), "Param data >>",data);
+	  console.log(common.getDateTime(), "Param data >>",data);
 	  res.send("Server received message");	  
 });
-function getDateTime() {
-    var date = new Date();
-    var hour = date.getHours();
-    hour = (hour < 10 ? "0" : "") + hour;
-    var min  = date.getMinutes();
-    min = (min < 10 ? "0" : "") + min;
-    var sec  = date.getSeconds();
-    sec = (sec < 10 ? "0" : "") + sec;
-    var year = date.getFullYear();
-    var month = date.getMonth() + 1;
-    month = (month < 10 ? "0" : "") + month;
-    var day  = date.getDate();
-    day = (day < 10 ? "0" : "") + day;
-    return day + "/" + month + "/" + year + " " + hour + ":" + min + ":" + sec;
-}
+
 function isLoggedIn(req, res, next) {
 	// if user is authenticated in the session, carry on
 	console.log('__________>> isLoggedIn ', req.isAuthenticated());
