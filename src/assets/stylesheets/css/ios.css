@@ -1,9 +1,22 @@
 /**
- * v 1.5.4
+ * Framework7 1.5.4
+ * Full featured mobile HTML framework for building iOS & Android apps
+ * 
+ * iOS Theme
+ *
+ * http://framework7.io/
+ * 
+ * Copyright 2017, Vladimir Kharlampidi
+ * The iDangero.us
+ * http://www.idangero.us/
+ * 
+ * Licensed under MIT
+ * 
+ * Released on: March 13, 2017
  */
 html,
 body,
-.esmile-root {
+.framework7-root {
   position: relative;
   height: 100%;
   width: 100%;
@@ -21,20 +34,20 @@ body {
   background: #fff;
   overflow: hidden;
 }
-.esmile-root {
+.framework7-root {
   overflow: hidden;
 }
 @media all and (width: 1024px) and (height: 691px) and (orientation: landscape) {
   html,
   body,
-  .esmile-root {
+  .framework7-root {
     height: 671px;
   }
 }
 @media all and (width: 1024px) and (height: 692px) and (orientation: landscape) {
   html,
   body,
-  .esmile-root {
+  .framework7-root {
     height: 672px;
   }
 }
@@ -2102,23 +2115,23 @@ i.icon.icon-plus {
   text-align: center;
   font-weight: 100;
 }
-.navbar .esmile-icons,
+.navbar .framework7-icons,
 .navbar .f7-icons,
-.toolbar .esmile-icons,
+.toolbar .framework7-icons,
 .toolbar .f7-icons {
   font-size: 22px;
 }
-.tabbar .esmile-icons,
+.tabbar .framework7-icons,
 .tabbar .f7-icons,
-.tabbar-labels .esmile-icons,
+.tabbar-labels .framework7-icons,
 .tabbar-labels .f7-icons {
   font-size: 25px;
 }
-.item-media .esmile-icons,
+.item-media .framework7-icons,
 .item-media .f7-icons {
   font-size: 29px;
 }
-.button .esmile-icons,
+.button .framework7-icons,
 .button .f7-icons {
   font-size: 22px;
 }
@@ -2139,7 +2152,7 @@ i.icon.icon-plus {
 }
 .icon .badge,
 .f7-icons .badge,
-.esmile-icons .badge {
+.framework7-icons .badge {
   position: absolute;
   left: 100%;
   margin-left: -10px;
@@ -5342,14 +5355,14 @@ html.retina.ios-6 .message.message-pic img {
   }
 }
 /* === Statusbar overlay === */
-html.with-statusbar-overlay .esmile-root {
+html.with-statusbar-overlay .framework7-root {
   padding-top: 20px;
   box-sizing: border-box;
 }
-html.with-statusbar-overlay .esmile-root .statusbar-overlay {
+html.with-statusbar-overlay .framework7-root .statusbar-overlay {
   display: block;
 }
-html.with-statusbar-overlay .esmile-root .panel {
+html.with-statusbar-overlay .framework7-root .panel {
   padding-top: 20px;
 }
 .statusbar-overlay {
@@ -5432,7 +5445,7 @@ html.with-statusbar-overlay .esmile-root .panel {
   animation: progressbar-infinite 1s linear infinite;
 }
 html.with-statusbar-overlay body > .progressbar-infinite,
-html.with-statusbar-overlay .esmile-root > .progressbar-infinite {
+html.with-statusbar-overlay .framework7-root > .progressbar-infinite {
   top: 20px;
 }
 .progressbar-infinite.color-multi {
@@ -5455,7 +5468,7 @@ html.with-statusbar-overlay .esmile-root > .progressbar-infinite {
   animation: progressbar-infinite-multicolor 3s linear infinite;
 }
 html.with-statusbar-overlay body > .progressbar-infinite.color-multi,
-html.with-statusbar-overlay .esmile-root > .progressbar-infinite.color-multi {
+html.with-statusbar-overlay .framework7-root > .progressbar-infinite.color-multi {
   top: 20px;
 }
 body > .progressbar,
@@ -5464,14 +5477,14 @@ body > .progressbar,
 .page > .progressbar,
 .panel > .progressbar,
 .popup > .progressbar,
-.esmile-root > .progressbar,
+.framework7-root > .progressbar,
 body > .progressbar-infinite,
 .view > .progressbar-infinite,
 .views > .progressbar-infinite,
 .page > .progressbar-infinite,
 .panel > .progressbar-infinite,
 .popup > .progressbar-infinite,
-.esmile-root > .progressbar-infinite {
+.framework7-root > .progressbar-infinite {
   position: absolute;
   left: 0;
   top: 0;
@@ -5486,7 +5499,7 @@ body > .progressbar-infinite,
   -webkit-animation: progressbar-out 300ms forwards;
   animation: progressbar-out 300ms forwards;
 }
-html.with-statusbar-overlay .esmile-root > .progressbar,
+html.with-statusbar-overlay .framework7-root > .progressbar,
 html.with-statusbar-overlay body > .progressbar {
   top: 20px;
 }
@@ -6814,36 +6827,36 @@ button.swiper-pagination-bullet {
   z-index: 11500;
 }
 body > .photo-browser,
-.esmile-root > .photo-browser {
+.framework7-root > .photo-browser {
   opacity: 0;
   display: none;
   -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
 }
 body > .photo-browser.photo-browser-in,
-.esmile-root > .photo-browser.photo-browser-in {
+.framework7-root > .photo-browser.photo-browser-in {
   display: block;
   -webkit-animation: photoBrowserIn 400ms forwards;
   animation: photoBrowserIn 400ms forwards;
 }
 body > .photo-browser.photo-browser-out,
-.esmile-root > .photo-browser.photo-browser-out {
+.framework7-root > .photo-browser.photo-browser-out {
   display: block;
   -webkit-animation: photoBrowserOut 400ms forwards;
   animation: photoBrowserOut 400ms forwards;
 }
 html.with-statusbar-overlay body > .photo-browser,
-html.with-statusbar-overlay .esmile-root > .photo-browser {
+html.with-statusbar-overlay .framework7-root > .photo-browser {
   height: -webkit-calc(100% - 20px);
   height: calc(100% - 20px);
   top: 20px;
 }
 .popup > .photo-browser .navbar,
 body > .photo-browser .navbar,
-.esmile-root > .photo-browser .navbar,
+.framework7-root > .photo-browser .navbar,
 .popup > .photo-browser .toolbar,
 body > .photo-browser .toolbar,
-.esmile-root > .photo-browser .toolbar {
+.framework7-root > .photo-browser .toolbar {
   -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
 }

@@ -97,7 +97,7 @@
   display: table;
 }
 .slide-small .swiper-pagination-progressbar {
-  background: #058cb3;
+  background: #2e1710;
 }
 .slide-small img {
   width: 100%;
@@ -105,7 +105,7 @@
 }
 .slide-small h3 {
   text-align: center;
-  color: #058cb3;
+  color: #2e1710;
   display: table-cell;
   vertical-align: middle;
   font-size: 23px;
@@ -159,7 +159,7 @@
 .text-welcome .content-block h3 {
   text-transform: uppercase;
   font-size: 23px;
-  color: #058cb3;
+  color: #2e1710;
 }
 .row-item {
   text-align: center;
@@ -179,7 +179,7 @@
 .container-items-p2 h3 {
   text-transform: uppercase;
   font-size: 25px;
-  color: #058cb3;
+  color: #2e1710;
   padding-top: 20px;
   text-align: center;
 }
@@ -187,7 +187,7 @@
   margin-top: 15px;
 }
 .container-items-p2 .button.active-state {
-  background: #058cb3;
+  background: #2e1710;
 }
 .container-items-p3 {
   height: 100%;
@@ -204,7 +204,7 @@
 .container-items-p3 h3 {
   text-transform: uppercase;
   font-size: 25px;
-  color: #058cb3;
+  color: #2e1710;
   padding-top: 20px;
   text-align: center;
 }
@@ -212,7 +212,7 @@
   margin-top: 15px;
 }
 .container-items-p3 .button.active-state {
-  background: #058cb3;
+  background: #2e1710;
 }
 .container-items-p4 {
   display: table;
@@ -235,14 +235,14 @@
 }
 .button {
   border: 1px solid #C08E3D;
-  color: #058cb3;
+  color: #2e1710;
   font-weight: bolder;
   background: #c08e3d !important;
   font-size: 20px;
 }
 @media (min-width: 1024px) {
   .modal {
-    color: #058cb3;
+    color: #2e1710;
     width: 415px;
     left: 43%;
   }
@@ -259,7 +259,7 @@
 }
 @media (min-width: 1366px) {
   .modal {
-    color: #058cb3;
+    color: #2e1710;
     width: 415px;
     left: 43%;
   }
@@ -381,7 +381,7 @@
   position: absolute;
   margin-left: 70%;
   margin-top: 10px;
-  color: #058cb3;
+  color: #2e1710;
 }
 .ripplelink .check_round i {
   font-size: 35px;
@@ -389,7 +389,7 @@
 .ink {
   display: block;
   position: absolute;
-  background: rgba(5, 140, 179, 0.8);
+  background: rgba(46, 23, 16, 0.8);
   border-radius: 100%;
   -webkit-transform: scale(0);
   -moz-transform: scale(0);

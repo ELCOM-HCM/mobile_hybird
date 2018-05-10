@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import FWPlugin from '.././common/app.plugin';
-import {Link} from 'react-router-dom';
 class Header extends Component{
 	constructor(props) {
 		super(props);
@@ -12,29 +11,32 @@ class Header extends Component{
     openPicker(){
     	FWPlugin.pickerModal('.picker-filter');
     }
-    openSide(event){
-		FWPlugin.openPanel('left');
-		$('.panel-overlay').on('click', function(){
-			FWPlugin.closePanel();
-		});
+	deleteAll(){
+		this.props.deleteAll();
 	}
 	render(){
+		var right = <div className="right">
+						<a href="#" className="link icon-only open-picker" onClick={this.openPicker.bind(this)}> <i
+							className="ios-icons">more_vertical</i></a>
+					</div>
+		if(this.props.type != 0){
+			right = <div className="right">
+						<a href="#" onClick={this.deleteAll.bind(this)} className="tab-link"> <i
+								className="ios-icons color-red">trash</i> </a>
+					</div>
+		}
 		return(
 				<div>
 					<div className="statusbar-overlay"></div>
 	    			<div className="navbar">
 	    				<div className="navbar-inner">
 	    					<div className="left">
-	    						<Link to={'/'} replace onClick={this.openSide.bind(this, event)} 
-							  	    className="open-pannel open-left-panel link icon-only" data-panel="left">
+	    						<a href="#" data-panel="left" className="open-panel">
 	    							<img className="logo" src={this.props.logo} />
-	    						</Link>
+	    						</a>
 	    					</div>
 	    					<div className="center">{this.props.name}</div>
-	    					<div className="right">
-	    						<Link to={'/'} replace className="link icon-only open-picker" onClick={this.openPicker.bind(this)}> <i
-	    							className="ios-icons">more_vertical</i></Link>
-	    					</div>
+	    					{right}
 	    				</div>
 	    			</div>
 				</div>

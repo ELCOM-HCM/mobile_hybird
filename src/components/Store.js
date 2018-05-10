@@ -19,7 +19,7 @@ class Store extends Component{
 		return(
 			<div id="store" className="view tab">
 				<div className="navbar-through">
-				    <Header name="STORE" logo={this.props.logo}/>
+				    <Header type="0" name="STORE" logo={this.props.logo}/>
 					<div data-page="store" className="page">
 						<div className="page-content">
 							<div className="list-block media-list">

@@ -1,11 +1,11 @@
-/**
- * @author DangTM
- */
+// config/passport.js
+
+// load all the things we need
 var LocalStrategy = require('passport-local').Strategy;
 var common = require('../common');
 var request = require('request');
 var user = {};
-
+// expose this function to our app using module.exports
 module.exports = function(passport) {
 
 	// =========================================================================
@@ -44,7 +44,17 @@ module.exports = function(passport) {
 													// and password from our
 													// form
 		common.log('Loggin with username ' + username + ' password:' + password);
-		request.post('http://esmile.e-smile.vn:3000/vna/login', {form: {username: username, password: password}}, 
+//		if(username == "elcom" && password == "321"){
+//			user = {
+//					username : 'elcom',
+//					user_id: '4',
+//					fullname : 'ELCOM HCM'//response.fullname,
+//				}
+//			return done(null, user);
+//		} else {
+//			return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
+//		}
+		request.post('http://esmile.e-smile.vn:3001/pantio/login', {form: {username: username, password: password}}, 
 				function(error, response, body){
 					if(error){
 						return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
@@ -57,6 +67,7 @@ module.exports = function(passport) {
 									user_id: data.user_id,
 									fullname : data.name,
 								}
+								common.log('call http://esmile.e-smile.vn:3000/pantio/login');
 								return done(null, user);
 						} else {
 							return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));

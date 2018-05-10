@@ -36,7 +36,7 @@ var Widget = {
 					Android.callNative(JSON.stringify(obj));
 				}
 				catch(ex){
-					ELC.TRANSPORTER = -1;
+					TSM.TRANSPORTER = -1;
 					console.log(ex);
 				}
 			}
