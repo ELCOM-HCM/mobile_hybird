@@ -3,6 +3,9 @@ import FWPlugin from '.././common/app.plugin';
 class Header extends Component{
 	constructor(props) {
 		super(props);
+		this.state = {
+			logo: "/styles/images/logo.png"
+		}
 	}
     componentWillMount(){
     }
@@ -11,35 +14,24 @@ class Header extends Component{
     openPicker(){
     	FWPlugin.pickerModal('.picker-filter');
     }
-	deleteAll(){
-		this.props.deleteAll();
-	}
 	render(){
-		var right = <div className="right">
-						<a href="#" className="link icon-only open-picker" onClick={this.openPicker.bind(this)}> <i
-							className="ios-icons">more_vertical</i></a>
-					</div>
-		if(this.props.type != 0){
-			right = <div className="right">
-						<a href="#" onClick={this.deleteAll.bind(this)} className="tab-link"> <i
-								className="ios-icons color-red">trash</i> </a>
-					</div>
-		}
 		return(
-				<div>
-					<div className="statusbar-overlay"></div>
-	    			<div className="navbar">
-	    				<div className="navbar-inner">
-	    					<div className="left">
-	    						<a href="#" data-panel="left" className="open-panel">
-	    							<img className="logo" src={this.props.logo} />
-	    						</a>
-	    					</div>
-	    					<div className="center">{this.props.name}</div>
-	    					{right}
-	    				</div>
-	    			</div>
+			<div className="navbar">
+				<div className="navbar-inner">
+					<div className="left">
+						<a href="#" data-panel="left" className="open-panel">
+							<img className="logo" src={this.state.logo} />
+						</a>
+					</div>
+					<div className="center">{this.props.name}</div>
+					<div className="right">
+						{this.props.type?
+							(<a href="#" style={{color: 'red'}} className="link icon-only open-picker" onClick={this.props.callback}><i className="fa fa-2x fa-trash-o" aria-hidden="true"></i></a>):
+							(<a href="#" className="link icon-only open-picker" onClick={this.openPicker.bind(this)}> <i className="ios-icons">more_vertical</i></a>)}
+						
+					</div>
 				</div>
+			</div>
 		);
 	}
 }

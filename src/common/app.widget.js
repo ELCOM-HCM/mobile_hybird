@@ -6,6 +6,7 @@
  * 
  */
 import Common from './app.common';
+import ELC from './app.android';
 var Widget = {
 		TRANSPORTER: null,
 		/**
@@ -36,7 +37,7 @@ var Widget = {
 					Android.callNative(JSON.stringify(obj));
 				}
 				catch(ex){
-					TSM.TRANSPORTER = -1;
+					ELC.TRANSPORTER = -1;
 					console.log(ex);
 				}
 			}

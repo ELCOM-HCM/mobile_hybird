@@ -3,14 +3,16 @@ import '../assets/stylesheets/css/app-rating.css';
 import React, { Component } from 'react';
 import API from '.././common/app.api';
 import ReactDOM from 'react-dom';
-import Cookie from "react-cookie";
 import FWPlugin from '.././common/app.plugin';
 import Common from '.././common/app.common';
 import Widget from '.././common/app.widget';
 import Login from './Login';
 import Header from './Header';
 import Store from './Store';
+import CSAT from './CSAT';
+import NPS from './NPS';
 var $$ = Dom7;
+var host_content = "http://demo.e-smile.vn:3000/farm_labiang/content/";
 class App extends Component {
 	constructor(props) {
 		super(props);
@@ -18,25 +20,32 @@ class App extends Component {
 			logo: '/styles/images/logo.png',
 			user: {},
 			location:[],
-			ratingDetail: [],
-			rating:[],
-			smile: [],
-			employee:[],
+			csat:[
+					{id: 1, name: 'EXCELLENT', score: 10, respondent: 5, image: host_content + "Excellent.png"}, 
+					{id: 2, name: 'GOOD', score: 8, respondent: 5, image: host_content + "Good.png"},
+					{id: 3, name: 'AVERAGE', score: 6, respondent: 5, image: host_content + "Average.png"},
+					{id: 4, name: 'POOR', score: 4, respondent: 5, image: host_content + "Poor.png"},
+					{id: 5, name: 'OTHER', score: 0, respondent: 5, image: host_content + "Other.png"}
+			],
+			nps:[
+					{id: 1, name: 'PROMOTERS', score: '0-6', respondent: 5, image: host_content + "nps_1.png"}, 
+					{id: 2, name: 'PASSIVES', score: '7-8', respondent: 5, image: host_content + "nps_3.png"},
+					{id: 3, name: 'DETRACTORS', score: '9-10', respondent: 5, image: host_content + "nps_2.png"}
+			],
 			color : ['#1ebfae', '#30a5ff', '#ffb53e', '#c7c700', '#f9243f', '#669999']
 		}
-	}
+	} 
 	componentWillMount(){	
 		
 	}
 	componentDidMount(){
 		var _=this;
-		
 		Common.request({
 			url: '/checkLogin',
 			type: 'POST'
 		}, function(res){
 			Common.logs(res);
-			if(res.status){
+			if(res.status){ 
 				Common.user = res.user;
 				_.state.user = res.user;
 				Widget.callAndroid({cmd:'set', key:'USER_ID', value: Common.user.user_id});
@@ -66,242 +75,22 @@ class App extends Component {
 				FWPlugin.loginScreen('.login-screen');
 			}
 		});
-		
 	}
 	componentWillReceiveProps(newProps){
-	}
-	
-	getSmile(eParent, eCircleChart, eColumnChart, text){
-		var _=this;
-		var location = [];
-		$('.list-room input:checkbox').each(function () {
-			if ($(this).is(':checked')) {
-				location.push($(this).val());
-			}
-		 });
-		var from = $('.date-from').attr('data-date') + ' 06:00';
-		var to = $('.date-to').attr('data-date') + ' 23:00';
-		var opt = {
-				date_from: from, 
-				date_to: to, 
-				location: location, 
-				lang_id: Cookie.load("languages") == undefined? "2": Cookie.load("languages").id,
-				id:[],
-		};
-    	Common.request({data: opt, url: API.getSmile()}, function(res){
-    		var length = res.length;
-    		var rating = [];
-    		var ratingDetail = [];
-    		// check change data
-    		for(var i = 0; i < length; i++){
-    			var obj = {
-    				id: res[i].id,
-    				name: res[i].name,
-    				value: Number(res[i].num),
-    				sum: (res[i].sum == 0 ? 1: Number(res[i].sum)),
-    				item:[]
-    			}
-    			if(i > 0){
-    				opt.id.push(res[i].id);
-    				ratingDetail.push(obj);
-    			}
-    			rating.push(obj);
-    		}
-    		
-    		if(_.state.rating.length > 0 && length > 0 
-        			&& rating[0].sum == _.state.rating[0].sum){
-        			return;
-        	}
-    		_.setState({
-    			rating: rating,
-    			ratingDetail: ratingDetail
-    		});
-    	  _.drawCircleChart(eCircleChart, rating);
-    	  _.drawColumnChart(eColumnChart, rating, text);
-    	  // draw smile Detail Rating
-    	  _.drawCircleChart('#rating__percent__', ratingDetail);
-    	  Common.request({data: opt, url: API.getRating()}, function(res1){
-			  if(res1.length > 0){
-				  var data = res1;
-				  var length = ratingDetail.length;
-				  for(var i = 0; i < length; i++){
-					  ratingDetail[i].item = data[i].rating;
-				  }
-				  _.setState({
-					  ratingDetail: ratingDetail
-		    	  });
-			  }
-		  });
-       });
-    }
-	
-	drawCircleChart(element, data){
-		var _=this;
-		var length = data.length;
-		for(var i = 0; i < length; i++){
-			var percent = data[i].value*100/data[i].sum; 
-			var classes = data[i].name.toLowerCase().replace(" ", '');
-			$(element+ ' .text__'+ i).text(data[i].name);
-			$(element+ ' .percent__'+ i).attr('data-percent', percent.toFixed());
-			$(element + ' .percent__' + i + ' .percent').text(percent.toFixed() + '%');
-			$(element + i).easyPieChart({
-				scaleColor : false,
-				barColor : this.state.color[i]
-			});
-			$(element + i).data('easyPieChart').update(percent.toFixed());
-		}
-		 
-	}
-	/**
-	 * Reference: https://www.highcharts.com/demo/column-drilldown
-	 */
-	drawColumnChart(elementNameId, data, title){
-		var _=this;
-		var arr = [];
-		var length = data.length;
-		for(var i = 0; i < length; i++){
-			var obj = {};
-	        obj.name = data[i].name;
-	        obj.color = _.state.color[i];
-	        obj.y = data[i].value;
-			arr.push(obj);
-		}
-		Highcharts.chart(elementNameId, {
-		    chart: {
-		        type: 'column',
-		        backgroundColor:'transparent'
-		    },
-		    title: {
-		        text: title,
-		        style: {
-		            color: 'rgba(255,255,255,0.8)'
-		        }
-		    },
-		    subtitle: {
-		       // text: 
-		    },
-		    xAxis: {
-		        type: 'category',
-		        labels: {
-	                style: {
-	                    color: 'rgba(255,255,255,0.8)'
-	                }
-	            }
-		    },
-		    yAxis: {
-		        title: {
-		            text: 'Total rated',
-		            style: {
-			            color: 'rgba(255,255,255,0.8)'
-			        }
-		        }
-
-		    },
-		    legend: {
-		        enabled: false
-		    },
-		    plotOptions: {
-		        series: {
-		            borderWidth: 0,
-		            dataLabels: {
-		                enabled: true,
-		                format: '{point.y:.1f}'
-		            }
-		        }
-		    },
-
-		    tooltip: {
-		        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-		        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}</b> of total<br/>'
-		    },
-
-		    series: [{
-		        name: 'Rating',
-		        colorByPoint: true,
-		        data: arr
-		    }]
-		});
-	}
-	getEmployee(){
-		var _=this;
-    	Common.request({url: API.getEmployee()}, function(res){
-			  if(res.length > 0){
-				  var data = res;
-				  var length = data.length;
-				  var employee = [];
-				  var listID = [];
-				  for(var i = 0; i < length; i++){
-					  var obj = {
-							 username: data[i].username,
-							 name: data[i].name,
-							 image: API.pathContent() + data[i].image,
-							 smile: []
-					  }
-					  listID.push(data[i].id);
-					  employee.push(obj);
-				  }
-				  _.setState({
-					  employee: employee
-		    	  });
-				  	var location = [];
-					$('.list-room input:checkbox').each(function () {
-						if ($(this).is(':checked')) {
-							location.push($(this).val());
-						}
-					 });
-					var from = $('.date-from').attr('data-date') + ' 06:00';
-					var to = $('.date-to').attr('data-date') + ' 23:00';
-					var opt = {
-							date_from: from, 
-							date_to: to, 
-							location: location, 
-							lang_id: Cookie.load("languages") == undefined? "2": Cookie.load("languages").id,
-							user_id: listID,
-					};
-					Common.request({data: opt, type:'GET', url: API.getEmployeeCompare()}, function(res1){
-						var length = res1.length;
-						var location = [];
-						var data = res1;
-						for(var i = 0; i < length; i++){
-							employee[i].smile = data[i].smile;
-						}
-						_.setState({
-							 employee: employee
-						});
-						
-					});
-			  }
-		  });
 	}
 	getLocation(){
 		var _=this;
 		if(_.state.location.length > 0){
-			_.getSmile('#rating', '#fd_percent__', 'fd_rating_container', 'RATING');
+			//_.getSmile('#csat', '#csat_percent', 'csat_trend', 'Customer Satisfaction');
 			return;
 		}
 		Common.request({type:'GET', url: API.getLocation()}, function(res){
 			_.setState({
 				location: res
 			});
-			_.getSmile('#rating', '#fd_percent__', 'fd_rating_container', 'RATING');
+			//_.getSmile('#csat', '#csat_percent', 'csat_trend', 'Customer Satisfaction');
 			
 		});
-	}
-	changeLanguage(){
-		let lang = Cookie.load("languages");
-		if(lang != undefined){
-			if(lang.code == "vn"){
-				$('.img_lang').attr('src', '/styles/images/vn.png');
-				Cookie.save("languages", JSON.stringify({code: "en", src: "/styles/images/vn.png", id: "2"}));
-			} else { // en
-				$('.img_lang').attr('src', '/styles/images/en.png');
-				Cookie.save("languages", JSON.stringify({code: "vn", src: "/styles/images/en.png", id: "1"}));
-			}
-		} else { // default show language english
-			$('.img_lang').attr('src', '/styles/images/en.png');
-			Cookie.save("languages", JSON.stringify({code: "vn", src: "/styles/images/en.png", id: "1"}));
-		}
-		location.reload();
 	}
 	logout(){
 		location.href="/#/login";
@@ -325,14 +114,6 @@ class App extends Component {
 				      </p>
 				      <p><i className="ios-icons">person</i> {this.state.user.fullname}</p>
 				      <p>
-				      	<a href="#" onClick={this.changeLanguage.bind(this)}>
-				      		<span><i className="fa fa-language"></i></span>
-				      		<span style={{'padding':'15px'}}>
-				      			<img className="img_lang" style={{width: '32px'}} src={Cookie.load("languages") == undefined? "/styles/images/vn.png": Cookie.load("languages").src}/>
-				      		</span>
-				      	</a>
-				      </p>
-				      <p>
 				      	<a href="#" onClick={this.logout.bind(this)}>
 				      		<i className="ios-icons">logout</i> LOGOUT
 				      	</a>
@@ -342,16 +123,14 @@ class App extends Component {
 			    <Login />
 			    <div className="views tabs toolbar-through">
 				      <Picker location={this.state.location} />
-				      <Rating color={this.state.color} 
+				      <CSAT color={this.state.color} 
 	    			 	location={this.state.location} 
 	    			 	logo={this.state.logo}
-				      	rating={this.state.rating} 
+				      	csat={this.state.csat} 
 			      		getLocation={this.getLocation.bind(this)} />
-				      <RatingDetail color={this.state.color} logo={this.state.logo} rating={this.state.ratingDetail} />
-				      <Employee color={this.state.color} logo={this.state.logo} employee={this.state.employee} />
-				      <Store store={this.state.location} logo={this.state.logo}/>
+				      <NPS nps={this.state.nps} logo={this.state.logo}/>
 				      <Notify logo={this.state.logo}/>
-				      <Tabbar getEmployee={this.getEmployee.bind(this)} getLocation={this.getLocation.bind(this)}/>
+				      <Tabbar getLocation={this.getLocation.bind(this)}/>
 				</div>
 	    	</div>
 	    )
@@ -382,7 +161,7 @@ class Rating extends React.Component{
 		return(
 			<div id="rating" className="view view-main tab active">
 				<div className="navbar-through">
-					<Header type="0" name="RATING" logo={this.props.logo}/>
+					<Header name="RATING" logo={this.props.logo}/>
 					<div className="page" data-page="dashboard">
 						<div className="page-content" data-ptr-distance="50">
 							<div className="content-block">
@@ -449,7 +228,7 @@ class RatingDetail extends React.Component {
    render() {
       return (
     		  <div id="rating_detail" className="view tab">
-    		  	<Header  type="0" name="DETAIL RATING" logo={this.props.logo}/>
+    		  	<Header name="DETAIL RATING" logo={this.props.logo}/>
     			<div className="navbar-through">
     				<div data-page="rating" className="page">
     					<div className="page-content rating_container">
@@ -514,7 +293,7 @@ class Employee extends React.Component {
 					  var obj = {
 							 username: data[i].username,
 							 name: data[i].name,
-							 image: API.pathContent() + data[i].image,
+							 image: API.getPathContent() + data[i].image,
 							 smile: []
 					  }
 					  listID.push(data[i].id);
@@ -530,7 +309,7 @@ class Employee extends React.Component {
    render() {
       return (
 		  <div id="employee" className="view tab">
-		   <Header type="0" name="EMPLOYEE" logo={this.props.logo}/>
+		   <Header name="EMPLOYEE" logo={this.props.logo}/>
 			<div className="navbar-through">
 				<div data-page="employee" className="page">
 					<div className="page-content">
@@ -540,7 +319,7 @@ class Employee extends React.Component {
 								      <div className="card-header">
 								      	<div className="row" style={{width: '100%'}}>
 								      		<div className="col-15">
-									      		<img style={{width: '35px', height:'35px', 'borderRadius': '50%', 'background': '#fff'}} src={item.image}/>
+									      		<img style={{width: '35px', height:'35px', 'borderRadius': '50%'}} src={item.image}/>
 								      		</div>
 									      	<div className="col-85">
 										      	<span>{item.name}</span>
@@ -553,7 +332,7 @@ class Employee extends React.Component {
 							            	<div className="row center">
 							            		{this.props.employee[index].smile.map(function(subItem, idx){
 							            			return (
-							            					<div key={subItem.name} className="col-20">
+							            					<div key={subItem.name} className="col-25">
 											            		<span className={"percent__" + idx}>{subItem.num}</span>
 											            	</div>
 									            	);
@@ -628,7 +407,7 @@ class Notify extends React.Component {
 		var $this = ReactDOM.findDOMNode(this.refs["noty__" + item.id]);
 		var arr = [];
 		arr.push(item.id);
-		FWPlugin.confirm('Are you sure delete?', 'PANTIO', function () {
+		FWPlugin.confirm('Are you sure delete?', 'ESMILE', function () {
 	   		var obj = {
 	   			id: arr,
 	   			user_id: Common.user.user_id
@@ -692,7 +471,7 @@ class Notify extends React.Component {
 	deleteAll(){
 		var _=this;
 		var arr = [];
-		FWPlugin.confirm('Are you sure delete all?', 'PANTIO', function () {
+		FWPlugin.confirm('Are you sure delete all?', 'ESMILE', function () {
 			var notify = _.state.notifications
 			for(var i = 0;i < notify.length; i++){
 				arr.push(notify[i].id);
@@ -711,7 +490,7 @@ class Notify extends React.Component {
 	render(){
 		return (
 			<div id="notify" className="view tab">
-				<Header type="1" name="NOTIFICATION" deleteAll={this.deleteAll.bind(this)} logo={this.props.logo}/>
+				<Header name="NOTIFICATION" logo={this.props.logo}/>
 		        <div className="navbar-fixed">
 		          <div data-page="notify" className="page">
 		            <div className="page-content">
@@ -843,18 +622,11 @@ class Tabbar extends React.Component {
       return (
     		 <div className="toolbar tabbar tabbar-labels">
 				<div className="toolbar-inner">
-					<a href="#rating" onClick={this.getLocation.bind(this)} className="tab-link active"> 
+					<a href="#csat" onClick={this.getLocation.bind(this)} className="tab-link active"> 
 						<i className="fa fa-smile-o" style={{fontSize: '27px'}} aria-hidden="true"></i>
-						<span className="tabbar-label">RATRING</span></a>
-					<a href="#rating_detail" onClick={this.getLocation.bind(this)} className="tab-link"> <i
-						className="ios-icons">favorites_fill</i> <span className="tabbar-label">DETAIL RATING</span></a>
-					<a href="#employee" onClick={this.getEmployee.bind(this)} className="tab-link"> 
-						<i className="fa fa-users" style={{fontSize: '27px'}} aria-hidden="true"></i>
-						<span className="tabbar-label">EMPLOYEE</span></a>
-					<a href="#store" onClick = {this.getStore.bind(this)} className="tab-link">
-						<i className="fa fa-shopping-bag" style={{fontSize: '27px'}} aria-hidden="true"></i>
-						<span className="tabbar-label">STORE</span>
-					</a>
+						<span className="tabbar-label">CSAT</span></a>
+					<a href="#nps" onClick={this.getLocation.bind(this)} className="tab-link"> <i
+						className="fa fa-tachometer"></i> <span className="tabbar-label">NPS</span></a>
 					<a href="#notify"
 						className="tab-link"> <i className="ios-icons icons-bell">bell_fill<span className="badge bg-red hidden">0</span></i><span
 						className="tabbar-label">NOTIFICATION</span></a>

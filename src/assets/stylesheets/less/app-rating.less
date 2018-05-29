@@ -1,7 +1,7 @@
 @import 'color.less';
 .logo {
 	img& {
-		width: 35px;
+		width: 65px;
 	}
 }
 .panel{
@@ -74,14 +74,12 @@
 
 .picker-filter {
 	&.picker-modal {
-		height: 365px;
+		height: 360px;
 	}
-	.list-block-search{
-		height: 205px;
-	}
+
 	.list-block {
 		margin: 15px 0;
-		max-height: 360px;
+		max-height: 190px;
 		overflow: scroll;
 		background: #fff;
 		margin-top: 0px;
@@ -119,7 +117,28 @@
 		padding-right: 2px;
 	}
 }
+#csat, #nps {
+	.col-30 {
+		margin-top: 15%;
+	}
 
+	.list-block {
+		ul {
+			background: transparent;
+		}
+		.item-title {
+			color: fade(@color-text, 80%);
+		}
+		span{
+			color: @color-active;
+			font-size: 20px;
+			margin-right: 10px;
+			i{
+				margin-right: 5px;
+			}
+		}
+	}
+}
 #rating {
 	.col-30 {
 		margin-top: 15%;

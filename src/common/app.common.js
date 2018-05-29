@@ -5,9 +5,10 @@
  * @addr ELCOM-HCM
  * 
  */
+import Cookie from "react-cookie";
 var eCommon = {
 		color : ['#1ebfae', '#30a5ff', '#ffb53e', '#c7c700', '#f9243f', '#669999'],
-		user: null
+		user: Cookie.load("user")
 }
 eCommon.isAndroid = function() {
 	return /Android/i
@@ -109,16 +110,32 @@ eCommon.logs = function(str){
 }
 eCommon.request = function(obj, success, error){
 	$.ajax({
-		url: obj.url,
-		type: obj.type || 'GET',
-		data: obj.data || "",
-		success: success || function(res){
-			eCommon.logs(res);
-		},
-		error: error || function(jqXHR, exception){
-			eCommon.logs(eCommon.ajaxError(jqXHR, exception));
-		}
-	});
+			url: obj.url,
+			type: obj.type || 'GET',
+			data: obj.data || "",
+			success: success || function(res){
+				eCommon.logs(res);
+			},
+			error: error || function(jqXHR, exception){
+				eCommon.logs(eCommon.ajaxError(jqXHR, exception));
+			}
+		});
+	
+}
+eCommon.requestAsync = function(obj){
+	return new Promise( function(resolve, reject) {
+		$.ajax({
+			url: obj.url,
+			type: obj.type || 'GET',
+			data: obj.data || ""
+		}).done(function(res){
+			resolve(res);
+		})
+		.fail(function(jqXHR, exception){
+			reject(jqXHR.status);
+		});
+	})
+	
 }
 
 eCommon.ajaxError = function(jqXHR, exception){

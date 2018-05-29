@@ -12,11 +12,15 @@ import FWPlugin from ".././common/app.plugin";
 import ReactDOM from "react-dom";
 import Common from  ".././common/app.common";
 import Widget from '.././common/app.widget';
+import { Redirect } from 'react-router';
 //import {Link} from 'react-router-dom';
 //import Widget from '.././common/app.widget';
 class Login extends React.Component{
 	constructor(props) {
 		super(props);
+		this.state = {
+			redirectToReferrer: false
+		}
 	}
 	componentWillMount() {
 		console.log('Welcome to login screen');
@@ -29,6 +33,7 @@ class Login extends React.Component{
 
 	}
 	login(){
+	    var _=this;
 		var username = $(ReactDOM.findDOMNode(this.refs.username)).val() || (Cookie.load("user") == undefined? "": Cookie.load("user").username);
 		var password = $(ReactDOM.findDOMNode(this.refs.password)).val() || (Cookie.load("user") == undefined? "": Cookie.load("user").password);
 		console.log(username + password);
@@ -44,18 +49,13 @@ class Login extends React.Component{
 			Common.logs(res);
 			// check login
 			if(res.status){
-				if(Cookie.load("user") == undefined){
-					var date = new Date();
-					date.setFullYear(date.getFullYear() + 10); // set expires 10 year
-					Cookie.save("user", JSON.stringify({username: username, password: password, user_id: res.user.user_id}), {expires: date});
-				}
-				Cookie.save("user", JSON.stringify({username: username, password: password, user_id: res.user.user_id}), {expires: date});
+				var date = new Date();
+				date.setFullYear(date.getFullYear() + 10); // set expires 10 year
+				Cookie.save("user", JSON.stringify({username: username, password: password, user_id: res.user.user_id, fullname: res.user.fullname}), {expires: date});
 				Common.user = res.user;
 				Widget.callAndroid({cmd:'set', key:'USER_ID', value: Common.user.user_id});
 				console.log(">>>>>>>>>>>>>>> SEND USER_ID " + Common.user.user_id);
-				location.href="/#/home";
-				location.reload();
-				FWPlugin.closeModal('.login-screen');
+				_.setState({redirectToReferrer: true});
 			} else {
 				FWPlugin.modal({
 					title: 'ELCOM',
@@ -69,8 +69,12 @@ class Login extends React.Component{
 		return false;
 	}
 	render(){
+		const { redirectToReferrer } = this.state;
+		if (redirectToReferrer) {
+      		return <Redirect to="/csat" />;
+    	}
 		return(
-			<div className="login-screen">
+			<div>
 				<div data-page="login-screen" className="page no-navbar no-toolbar no-swipeback">
 				  <div className="page-content login-screen-content">
 					<form style={{'marginTop': '30%'}}>

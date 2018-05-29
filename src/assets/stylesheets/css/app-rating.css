@@ -1,5 +1,5 @@
 img.logo {
-  width: 35px;
+  width: 65px;
 }
 .panel {
   background: #2e1710;
@@ -64,14 +64,11 @@ img.logo {
   color: #8e8e93 ! important;
 }
 .picker-filter.picker-modal {
-  height: 365px;
-}
-.picker-filter .list-block-search {
-  height: 205px;
+  height: 360px;
 }
 .picker-filter .list-block {
   margin: 15px 0;
-  max-height: 360px;
+  max-height: 190px;
   overflow: scroll;
   background: #fff;
   margin-top: 0px;
@@ -103,6 +100,28 @@ img.logo {
 .card i {
   font-size: 15px;
   padding-right: 2px;
+}
+#csat .col-30,
+#nps .col-30 {
+  margin-top: 15%;
+}
+#csat .list-block ul,
+#nps .list-block ul {
+  background: transparent;
+}
+#csat .list-block .item-title,
+#nps .list-block .item-title {
+  color: rgba(255, 255, 255, 0.8);
+}
+#csat .list-block span,
+#nps .list-block span {
+  color: #C08E3D;
+  font-size: 20px;
+  margin-right: 10px;
+}
+#csat .list-block span i,
+#nps .list-block span i {
+  margin-right: 5px;
 }
 #rating .col-30 {
   margin-top: 15%;

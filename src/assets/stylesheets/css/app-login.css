@@ -40,19 +40,16 @@
 }
 .login-screen-content form .thumbnail {
   background: transparent;
-  height: 100px;
-  margin: -75px auto 30px;
-  padding: 20px 30px;
+  padding: 25px;
   border-top-left-radius: 100%;
   border-top-right-radius: 100%;
   border-bottom-left-radius: 100%;
   border-bottom-right-radius: 100%;
   box-sizing: border-box;
-  margin-left: 25%;
 }
 .login-screen-content form .thumbnail img {
   display: block;
-  width: 100px;
+  width: 100%;
 }
 .login-screen-content form input {
   outline: 0;
