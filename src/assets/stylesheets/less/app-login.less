@@ -1,7 +1,8 @@
 @import "color.less";
 .login-screen-content {
+	display: table; 
+    width: 100%; 
 	background-image: url('/styles/images/bg.jpg');
-//	background-color: @color-root;
 	background-repeat: no-repeat;
     background-position: bottom;
     background-size: cover;
@@ -26,9 +27,12 @@
 		}
 	}
 	form{
+		  display: table-cell;
+    	  text-align: center;
+    	  vertical-align: middle;
 		  position: relative;
 		  z-index: 1;
-		  background: #fff;
+		  background: fade(#fff, 50%);
 		  -webkit-box-shadow: 0px 0px 26px -3px @color-root;
 		  -moz-box-shadow: 0px 0px 26px -3px @color-root;
 		  box-shadow: 0px 0px 26px -3px @color-root;

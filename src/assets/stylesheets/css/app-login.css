@@ -1,4 +1,6 @@
 .login-screen-content {
+  display: table;
+  width: 100%;
   background-image: url('/styles/images/bg.jpg');
   background-repeat: no-repeat;
   background-position: bottom;
@@ -23,9 +25,11 @@
   color: #2e1710 !important;
 }
 .login-screen-content form {
+  display: table-cell;
+  vertical-align: middle;
   position: relative;
   z-index: 1;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.5);
   -webkit-box-shadow: 0px 0px 26px -3px #2e1710;
   -moz-box-shadow: 0px 0px 26px -3px #2e1710;
   box-shadow: 0px 0px 26px -3px #2e1710;

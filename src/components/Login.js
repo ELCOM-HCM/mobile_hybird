@@ -70,6 +70,7 @@ class Login extends React.Component{
 	}
 	render(){
 		const { redirectToReferrer } = this.state;
+		const _=this;
 		if (redirectToReferrer) {
       		return <Redirect to="/csat" />;
     	}
@@ -77,7 +78,7 @@ class Login extends React.Component{
 			<div>
 				<div data-page="login-screen" className="page no-navbar no-toolbar no-swipeback">
 				  <div className="page-content login-screen-content">
-					<form style={{'marginTop': '30%'}}>
+					<form>
 				      <div className="thumbnail">
 				      	<img src="/styles/images/logo.png" />
 				      </div>
@@ -99,7 +100,11 @@ class Login extends React.Component{
 				          		<i className="ios-icons">lock</i>
 				          	  </div>
 				              <div className="item-input">
-				                <input type="password" ref="password" name="password" placeholder="Password"/>
+				                <input onKeyPress={(e)=>{
+				                	if(e.key == 'Enter') {
+								        _.login();
+								    }
+				                }} type="password" ref="password" name="password" placeholder="Password"/>
 				              </div>
 				            </div>
 				          </li>
