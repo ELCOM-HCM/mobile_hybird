@@ -129,9 +129,14 @@ eCommon.requestAsync = function(obj){
 			type: obj.type || 'GET',
 			data: obj.data || ""
 		}).done(function(res){
+			if(res.status == 500){
+				reject(res);
+			}
 			resolve(res);
 		})
 		.fail(function(jqXHR, exception){
+			console.log('Reject');
+			console.log(exception);
 			reject(jqXHR.status);
 		});
 	})

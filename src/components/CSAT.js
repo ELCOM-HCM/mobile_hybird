@@ -47,7 +47,7 @@ class CSAT extends Component{
 				<User />
 				<div className="views tabs toolbar-through">
 					<Picker location={this.state.location} callback={this.getCSAT.bind(this)}/>
-					<div id="csat" className="view view-main tab active">
+					<div id="csat" className="view tab active">
 						<div className="navbar-through">
 							<Header name="CUSTOMER SATISFACTION"/>
 							<div className="page" data-page="">

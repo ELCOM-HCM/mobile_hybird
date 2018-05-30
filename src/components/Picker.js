@@ -19,18 +19,11 @@ class Picker extends React.Component{
     	console.log('componentWillMount');
     }
    async componentDidMount(){
-    	/*let location = await Common.requestAsync({type:'GET', url: API.getLocation()});
-    	this.setState({
-			location: location
-		});*/	
     	var mySearchbar = FWPlugin.searchbar('.searchbar', {
     	    searchList: '.list-block-search',
     	    searchIn: '.item-title'
     	});  
-    	$('.date-from').val(moment().subtract('days', 30).format('YYYY-MM-DD')); // get 30 day
-//   	$('.date-from').val(moment().format('YYYY-MM-DD')); // get today
-		$('.date-to').val(moment().format('YYYY-MM-DD')); // get today 
-		$('.date-from').on('change', function(){
+    	$('.date-from').on('change', function(){
 			this.setAttribute(
 			   "data-date", 
 			   moment(this.value, "YYYY-MM-DD").format( this.getAttribute("data-date-format") ));
@@ -40,6 +33,11 @@ class Picker extends React.Component{
 			   "data-date", 
 			   moment(this.value, "YYYY-MM-DD").format( this.getAttribute("data-date-format") ));
 		});
+    	$('.date-from').val(moment().subtract('days', 30).format('YYYY-MM-DD')); // get 30 day
+    	$('.date-from').attr("data-date", moment(moment().subtract('days', 30), "YYYY-MM-DD").format($('.date-from').attr("data-date-format") ));
+		$('.date-to').val(moment().format('YYYY-MM-DD')); // get today 
+		$('.date-to').attr("data-date", moment(moment(), "YYYY-MM-DD").format($('.date-to').attr("data-date-format")));
+		
     }
 	render(){
 		return(

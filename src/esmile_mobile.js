@@ -12,6 +12,7 @@ import NPS from './components/NPS';
 import Notify from './components/Notify';
 import Index from './components/IndexPage';
 import Login from './components/Login';
+import Comment from './components/Comment';
 import { browserHistory } from 'react-router';
 import { HashRouter as Router, Route, Link, hashHistory, IndexRoute  } from 'react-router-dom'; // recommend
 
@@ -23,6 +24,7 @@ ReactDOM.render((
 		    <Route path="/login" component={Login}/>
 			<Route path="/csat" component={CSAT}/>
 			<Route path="/nps" component={NPS}/>
+			<Route path="/comment" component={Comment}/>
 			<Route path="/notify" component={Notify}/>
 		</div>
 	   </Router>

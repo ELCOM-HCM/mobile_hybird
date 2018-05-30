@@ -44,7 +44,7 @@ class NPS extends Component{
 				<User />
 				<div className="views tabs toolbar-through">
 					<Picker location={this.state.location} callback={this.getNPS.bind(this)}/>
-					<div id="nps" className="view view-main tab active">
+					<div id="nps" className="view tab active">
 						<div className="navbar-through">
 							<Header name="NET PROMOTER SCORE"/>
 							<div className="page" data-page="">

@@ -166,7 +166,7 @@ class Notify extends React.Component {
 				          </div>
 				        </div>
 			      </div>
-			      <Tabbar index="3"/>
+			      <Tabbar index="4"/>
 				</div>
 			</div>
 			

@@ -24,7 +24,7 @@ class Tabbar extends React.Component{
 			var length = res.length;
 			var open = 0;
 			for(var i = 0; i < length; i++){
-				if(obj.status == 0){
+				if(res[i].status == 0){
 					open++;
 				}
 			}
@@ -46,7 +46,11 @@ class Tabbar extends React.Component{
 						<i className="fa fa-tachometer" style={{fontSize: '27px'}} aria-hidden="true"></i>
 						<span className="tabbar-label">NPS</span>
 					</Link>
-					<Link to={'/notify'} replace id="num_notify" className={this.props.index == "3"? "tab-link active": "tab-link"}> 
+					<Link to={'/comment'} replace className= {this.props.index == "3"? "tab-link active": "tab-link"}> 
+						<i className="fa fa-commenting" style={{fontSize: '27px'}} aria-hidden="true"></i>
+						<span className="tabbar-label">RESPONDENTS</span>
+					</Link>
+					<Link to={'/notify'} replace id="num_notify" className={this.props.index == "4"? "tab-link active": "tab-link"}> 
 						<i className="ios-icons icons-bell">bell_fill<span className={num_notify > 0 ? "badge bg-red":"badge bg-red hidden"}>{num_notify}</span></i><span
 						className="tabbar-label">NOTIFICATION</span></Link>
 				</div>
