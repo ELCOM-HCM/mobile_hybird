@@ -1,6 +1,15 @@
 img.logo {
   width: 65px;
 }
+.languages i {
+  font-size: 25px;
+}
+.languages span {
+  margin-left: 5px;
+}
+.languages span img {
+  width: 35px;
+}
 .panel {
   background: #2e1710;
 }
@@ -112,11 +121,12 @@ img.logo {
 #csat .list-block .item-title,
 #nps .list-block .item-title {
   color: rgba(255, 255, 255, 0.8);
+  font-size: 15px;
 }
 #csat .list-block span,
 #nps .list-block span {
   color: #C08E3D;
-  font-size: 20px;
+  font-size: 15px;
   margin-right: 10px;
 }
 #csat .list-block span i,
@@ -127,6 +137,7 @@ img.logo {
   /* === Messages === */
 }
 #comment .messages {
+  overflow: auto;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -332,7 +343,7 @@ img.logo {
 }
 #comment .messages-content,
 #comment .messages {
-  background: #fff;
+  background: rgba(255, 255, 255, 0);
 }
 #comment .messages-title {
   font-size: 11px;

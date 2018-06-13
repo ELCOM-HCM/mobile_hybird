@@ -19,7 +19,7 @@ class Index extends Component{
 			type: 0 // default Login Screen
 		}
 	}
-	componentWillMount() {
+	async componentWillMount() {
 		Common.logs('CHECK LOGIN');
 		Common.user = Cookie.load("user");
 		var _=this
@@ -27,21 +27,18 @@ class Index extends Component{
 			this.setState({type: 0});
 			return;
 		}
-		Common.request({
-			url: '/checkLogin',
-			type: 'POST'
-		}, function(res){
-			if(res.status){
-				_.setState({type: 1});
-			} 
-		});
+		let status = await Common.requestAsync({url: '/checkLogin',type: 'POST'});
+		if(this.refs.index_page && Cookie.load("user") != undefined){
+			this.setState({type: status});
+		}
 	}
 	componentDidMount(){	
 	}
 	render(){
+		const {type} = this.state;
 		return (
-			<div>
-				{this.state.type?(<Redirect to="/csat"/>) : (<Redirect to="/login"/>)}
+			<div ref="index_page">
+				{type?(<Redirect to="/csat"/>) : (<Redirect to="/login"/>)}
 			</div>
 		);
 	}

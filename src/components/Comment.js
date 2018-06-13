@@ -7,6 +7,7 @@
  */
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import renderHTML from 'react-render-html';
 import Common from  ".././common/app.common";
 import Header from './Header.js';
 import API from '.././common/app.api';
@@ -42,12 +43,17 @@ class Comment extends Component{
 				date_from: from, 
 				date_to: to, 
 				location: location, 
-				langid: '1'
+				langid: Common.lang_id
 		};
 		let comment = [];
 		comment = await Common.requestAsync({type:'GET', url: API.getRatingDetail(), data: opt});
-		this.setState({rating: comment.reverse()});
-		$('.messages').scrollTo($('.messages').get(0).scrollHeight);
+		this.setState({rating: comment});
+		let height = 0;
+		$('#messages .message').each(function(){
+			height+= parseInt($(this).height());
+		});
+		$('#messages').scrollTop(1000);
+	
 		return comment;
 	}
 	render(){
@@ -61,7 +67,7 @@ class Comment extends Component{
 							<Header name="RESPONDENTS" logo={this.props.logo}/>
 							<div className="page" data-page="">
 								<div className="page-content messages-content">
-									<div className="messages">
+									<div id="messages" className="messages">
 								      {/*<!-- Messages title -->*/}
 								      {/*<div className="messages-title"><b>Sunday, Feb 9,</b> 12:58</div>*/}
 								      {/*<!-- Full layout sent message -->*/}
@@ -71,10 +77,10 @@ class Comment extends Component{
 										        <div className="message-avatar" ></div>
 										        <div className="message-content">
 										          {/*<div className="message-name">{item.store_name}</div>*/}
-										          <div className="message-header">{item.store_name}</div>
+										          <div className="message-header">{renderHTML(item.store_name)}</div>
 										          <div className="message-bubble">
-										            <div className="message-text-header">{item.smile_name}</div>
-										            <div className="message-text">{item.rating}</div>
+										            <div className="message-text-header">{renderHTML(item.smile_name)}</div>
+										            <div className="message-text">{renderHTML(item.rating)}</div>
 										            <div className="message-text-footer">{item.date}</div>
 										          </div>
 										          {/*<div className="message-footer">Message footer</div>*/}

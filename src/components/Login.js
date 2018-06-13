@@ -22,21 +22,20 @@ class Login extends React.Component{
 			redirectToReferrer: false
 		}
 	}
-	componentWillMount() {
-		console.log('Welcome to login screen');
-		// auto login
-		if(Cookie.load('user') != undefined){
-			//this.login();
+	async componentWillMount() {
+		Common.logs('CHECK LOGIN');
+		let status = await Common.requestAsync({url: '/checkLogin',type: 'POST'});
+		if(status && Cookie.load("user") != undefined){
+			this.setState({redirectToReferrer: status});
 		}
+		
 	}
 	componentDidMount(){
-
 	}
 	login(){
 	    var _=this;
 		var username = $(ReactDOM.findDOMNode(this.refs.username)).val() || (Cookie.load("user") == undefined? "": Cookie.load("user").username);
 		var password = $(ReactDOM.findDOMNode(this.refs.password)).val() || (Cookie.load("user") == undefined? "": Cookie.load("user").password);
-		console.log(username + password);
 		if(username == "" && password == ""){
 			return;
 		}
@@ -54,11 +53,11 @@ class Login extends React.Component{
 				Cookie.save("user", JSON.stringify({username: username, password: password, user_id: res.user.user_id, fullname: res.user.fullname}), {expires: date});
 				Common.user = res.user;
 				Widget.callAndroid({cmd:'set', key:'USER_ID', value: Common.user.user_id});
-				console.log(">>>>>>>>>>>>>>> SEND USER_ID " + Common.user.user_id);
+				console.log(">SEND USER_ID " + Common.user.user_id);
 				_.setState({redirectToReferrer: true});
 			} else {
 				FWPlugin.modal({
-					title: 'ELCOM',
+					title: 'ESMILE',
 					text: '<p class="color-red"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> LOGIN FAIL</p>', 
 					buttons: [
 					     {text: '<span class="color-red"><i class="ios-icons">close</i> close</span>', bold: true}
@@ -75,7 +74,7 @@ class Login extends React.Component{
       		return <Redirect to="/csat" />;
     	}
 		return(
-			<div>
+			<div style={{'display': (redirectToReferrer?'none':'block')}}>
 				<div data-page="login-screen" className="page no-navbar no-toolbar no-swipeback">
 				  <div className="page-content login-screen-content">
 					<form>

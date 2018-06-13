@@ -20,7 +20,7 @@ import { HashRouter as Router, Route, Link, hashHistory, IndexRoute  } from 'rea
 ReactDOM.render((
 	   <Router history={browserHistory}>
 		 <div style={{'height': '100%'}}>
-			<Route exact path="/" component={Index}/>
+			<Route exact path="/" component={Login}/>
 		    <Route path="/login" component={Login}/>
 			<Route path="/csat" component={CSAT}/>
 			<Route path="/nps" component={NPS}/>

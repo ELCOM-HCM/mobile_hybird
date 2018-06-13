@@ -8,18 +8,21 @@ import Tabbar from './Tabbar';
 import Picker from './Picker';
 import Trend from 'react-trend';
 import {Area, CirclePie, BarMetric} from 'react-simple-charts';
+import renderHTML from 'react-render-html';
 class CSAT extends Component{
 	constructor(props) {
 		super(props);
 		this.state = {
 			location:[],
 			csat:[
-				{id: 1, name: 'EXCELLENT', score: 10, respondent: 5, image: API.getPathContent() + "Excellent.png"}, 
-				{id: 2, name: 'GOOD', score: 8, respondent: 5, image: API.getPathContent() + "Good.png"},
-				{id: 3, name: 'AVERAGE', score: 6, respondent: 5, image: API.getPathContent() + "Average.png"},
-				{id: 4, name: 'POOR', score: 4, respondent: 5, image: API.getPathContent() + "Poor.png"},
-				{id: 5, name: 'OTHER', score: 0, respondent: 5, image: API.getPathContent() + "Other.png"}
-			]
+				{id: 1, name: 'EXCELLENT', score: 10, respondent: 5, image:  "Excellent.png"}, 
+				{id: 2, name: 'GOOD', score: 8, respondent: 5, image:  "Good.png"},
+				{id: 3, name: 'AVERAGE', score: 6, respondent: 5, image: "Average.png"},
+				{id: 4, name: 'POOR', score: 4, respondent: 5, image:  "Poor.png"},
+				{id: 5, name: 'OTHER', score: 0, respondent: 5, image: "Other.png"}
+			],
+			csat_trend:[{date: 'dd-mm-yyyy', value: 10}, {date: 'dd-mm-yyyy', value: 20}, {date: 'dd-mm-yyyy', value: 15}],
+			csat_num: 0
 		}
 	}
 	componentWillMount(){
@@ -27,6 +30,8 @@ class CSAT extends Component{
 	async componentDidMount(){
 		let location = await Common.requestAsync({type:'GET', url: API.getLocation()});
 		this.setState({location: location});
+		let data = this.getCSAT();
+		setInterval(this.getCSAT.bind(this), 3000);
 	}
 	async getCSAT(){
 		let location = [];
@@ -37,11 +42,23 @@ class CSAT extends Component{
 		 });
 		let from = $('.date-from').attr('data-date') + ' 06:00';
 		let to = $('.date-to').attr('data-date') + ' 23:00';
-		let csat = await Common.requestAsync({type:'GET', url: API.getLocation()});
-		return csat;
+		var opt = {
+				date_from: from, 
+				date_to: to, 
+				location: location, 
+				lang_id: Common.lang_id
+		};
+		let data = await Common.requestAsync({type:'GET', url: API.getCSAT(), data:opt});
+		if(this.refs.csat){
+			this.setState({csat:data.data_csat, csat_trend: data.csat_trend, csat_num: data.csat});
+		}
+		return data;
 	}
 	
 	render(){
+		const {csat_trend} = this.state;
+		const {csat} = this.state;
+		const {csat_num} = this.state;
 		return (
 			<div style={{'height': '100%'}}>
 				<User />
@@ -54,18 +71,18 @@ class CSAT extends Component{
 								<div className="page-content" data-ptr-distance="50">
 									<div className="row">
 										<div className="col-60">
-											<div className="list-block media-list">
+											<div ref="csat" className="list-block media-list">
 												<ul>
-											      {this.state.csat.map(function(item, index){
+											      {csat.map(function(item, index){
 													return(
 														<li key={item.id + '__csat'}>
 													      <div className="item-content">
 													        <div className="item-media">
-													        	<img width="45px" src={item.image} />
+													        	<img width="45px" src={API.getPathContent() + item.image} />
 													        </div>
 													        <div className="item-inner">
 													          <div className="item-title-row">
-													            <div className="item-title">{item.name}</div>
+													            <div className="item-title">{renderHTML(item.name)}</div>
 													          </div>
 													          <div className="item-subtitle">
 													          	<span>
@@ -87,7 +104,7 @@ class CSAT extends Component{
 										</div>
 										<div className="col-40" style={{'textAlign':"center", 'marginTop': '25%'}}>
 											<p style={{'color':'#fff'}}>CSAT</p>
-											<CirclePie width={100} height={100} label="CSAT" labelColor='#408AE5' percent={20}/>
+											<CirclePie width={100} height={100} label="CSAT" labelColor='#408AE5' percent={csat_num}/>
 										</div>
 									</div>
 									<div className="content-block">
@@ -97,7 +114,7 @@ class CSAT extends Component{
 										    autoDraw
 										    autoDrawDuration={3000}
 										    autoDrawEasing="ease-out"
-										    data={[0,2,5,9,5,10,3,5,0,0,1,8,2,9,0]}
+										    data={csat_trend}
 										    gradient={['#42b3f4']}
 										    radius={12}
 										    strokeWidth={3}

@@ -8,7 +8,8 @@
 import Cookie from "react-cookie";
 var eCommon = {
 		color : ['#1ebfae', '#30a5ff', '#ffb53e', '#c7c700', '#f9243f', '#669999'],
-		user: Cookie.load("user")
+		user: Cookie.load("user"),
+		lang_id: Cookie.load("lang_id") || "1"
 }
 eCommon.isAndroid = function() {
 	return /Android/i

@@ -16,7 +16,7 @@ class Picker extends React.Component{
     	
     }
     componentWillMount(){
-    	console.log('componentWillMount');
+    	
     }
    async componentDidMount(){
     	var mySearchbar = FWPlugin.searchbar('.searchbar', {
