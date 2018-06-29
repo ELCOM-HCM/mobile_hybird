@@ -1,10 +1,9 @@
-/**
- * @author DangTM
- */
+// config/passport.js
+
+// load all the things we need
 var LocalStrategy = require('passport-local').Strategy;
 var common = require('../common');
 var request = require('request');
-var db = require('./database');
 var user = {};
 // expose this function to our app using module.exports
 module.exports = function(passport) {
@@ -44,20 +43,38 @@ module.exports = function(passport) {
 	}, function(req, username, password, done) { // callback with username
 													// and password from our
 													// form
-		console.log('Loggin with username ' + username + ' password:' + password);
-		db.findUser(username, password, function(result){
-			console.log(result);
-//			if(data.status){
-//				user = {
-//						username : username,
-//						user_id: data.user_id,
-//						fullname : data.name,
-//					}
-//					return done(null, user);
-//			} else {
-//				return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
-//			}
-		});
+		common.log('Loggin with username ' + username + ' password:' + password);
+		if(username == "elcom" && password == "321"){
+			user = {
+					username : 'elcom',
+					user_id: '4',
+					fullname : 'ELCOM HCM'//response.fullname,
+				}
+			return done(null, user);
+		} else {
+			return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
+		}
+		/*request.post('http://demo.e-smile.vn:3000/farm_labiang/login', {form: {username: username, password: password}}, 
+				function(error, response, body){
+					if(error){
+						return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
+					} else {
+						common.log(body);
+						var data = JSON.parse(body);
+						if(data.status == null){
+							user = {
+									username : username,
+									user_id: data.user_id,
+									fullname : data.name,
+								}
+								common.log('call http://demo.e-smile.vn:3000/farm_labiang/login');
+								return done(null, user);
+						} else {
+							return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
+						}
+						
+					}
+	    		});*/
 	}));
 
 };
