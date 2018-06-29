@@ -5,10 +5,15 @@
  * @addr ELCOM-HCM
  * 
  */
+import Cookie from "react-cookie";
 var eCommon = {
 		color : ['#1ebfae', '#30a5ff', '#ffb53e', '#c7c700', '#f9243f', '#669999'],
-		user: null,
-		socket: null
+		user: Cookie.load("user"),
+		lang_id: Cookie.load("lang_id") || "1"
+}
+eCommon.isAndroid = function() {
+	return /Android/i
+			.test(navigator.userAgent) ? !0 : !1
 }
 eCommon.drawCircleChart = function(element, data){
 	var _=this;
@@ -26,10 +31,6 @@ eCommon.drawCircleChart = function(element, data){
 		$(element + i).data('easyPieChart').update(percent.toFixed());
 	}
 	 
-}
-eCommon.isAndroid = function() {
-	return /Android/i
-			.test(navigator.userAgent) ? !0 : !1
 }
 /**
  * Reference: https://www.highcharts.com/demo/column-drilldown
@@ -110,16 +111,36 @@ eCommon.logs = function(str){
 }
 eCommon.request = function(obj, success, error){
 	$.ajax({
-		url: obj.url,
-		type: obj.type || 'GET',
-		data: obj.data || "",
-		success: success || function(res){
-			eCommon.logs(res);
-		},
-		error: error || function(jqXHR, exception){
-			eCommon.logs(eCommon.ajaxError(jqXHR, exception));
-		}
-	});
+			url: obj.url,
+			type: obj.type || 'GET',
+			data: obj.data || "",
+			success: success || function(res){
+				eCommon.logs(res);
+			},
+			error: error || function(jqXHR, exception){
+				eCommon.logs(eCommon.ajaxError(jqXHR, exception));
+			}
+		});
+}
+eCommon.requestAsync = function(obj){
+	return new Promise( function(resolve, reject) {
+		$.ajax({
+			url: obj.url,
+			type: obj.type || 'GET',
+			data: obj.data || ""
+		}).done(function(res){
+			if(res.status == 500){
+				reject(res);
+			}
+			resolve(res);
+		})
+		.fail(function(jqXHR, exception){
+			console.log('Reject');
+			console.log(exception);
+			reject(jqXHR.status);
+		});
+	})
+	
 }
 
 eCommon.ajaxError = function(jqXHR, exception){

@@ -1,58 +1,74 @@
-import eCommon from './app.common';
+import Common from './app.common';
 var eAPI = {
-	ip: 'esmile.e-smile.vn', //'103.254.12.200',
-	port:'3001'
+	ip: 'demo.e-smile.vn',
+	port:'3000',
+	context: '/farm_labiang'
 }
-eAPI.pathContent = function(){
-	return 'http://' + eAPI.ip + ':3001' + '/ecopark/content/';
+eAPI.getPathContent = function(){
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/content/');
 }
 eAPI.login = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/tablet/login';
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/tablet/login');
 }
 eAPI.location = function(){
-		return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/tablet/location';
+		return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/tablet/location?id=' + Common.user.id);
 }
 eAPI.register = function(type){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/tablet/register';
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/tablet/register');
 }
 eAPI.smile = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/tablet/smile';
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/tablet/smile');
 }
 eAPI.rating = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/tablet/rating';
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/tablet/rating');
 }
 eAPI.comment= function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/tablet/comment';
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/tablet/comment');
 }
 eAPI.info = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/tablet/info';
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/tablet/info');
 }
 // api for mobile phone
-eAPI.getDepartment = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/tablet/department?key=-1&langid=2';
-}
 eAPI.getLocation = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/location';
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/location?id=' + Common.user.user_id);
 }
-eAPI.getRoom = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/room';
+eAPI.getEmployee = function(){
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/employee');
+}
+eAPI.getEmployeeCompare = function(){
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/employee/compare');
 }
 eAPI.getSmile = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/smile';
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/smile');
 }
 eAPI.getRating = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/rating/all';
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/rating/all');
+}
+eAPI.getRatingById = function(){
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/rating');
 }
 eAPI.getSurvey = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/survey/vote';
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/survey/vote');
 }
 eAPI.getNotify = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/mobile/notify/all';
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/mobile/notify/all');
 }
 eAPI.deleteNotify = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/mobile/notify/delete';
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/mobile/notify/delete');
 }
 eAPI.deleteNotifyAll = function(){
-	return 'http://' + eAPI.ip + ':' + eAPI.port + '/ecopark/mobile/notify/delete/all';
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/mobile/notify/delete/all');
+}
+eAPI.getRatingDetail = function(){
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/csat/detail');
+}
+eAPI.getCSAT = function(){
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/mobile/csat');
+}
+eAPI.getNPS = function(){
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/mobile/nps');
+}
+eAPI.getOverview = function(){
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/overview/cast/nps');
 }
 export default eAPI;

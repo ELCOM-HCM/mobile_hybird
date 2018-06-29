@@ -1,4 +1,6 @@
 .login-screen-content {
+  display: table;
+  width: 100%;
   background-image: url('/styles/images/bg.jpg');
   background-repeat: no-repeat;
   background-position: bottom;
@@ -13,46 +15,45 @@
 .login-screen-content .login-screen-title {
   max-width: 480px;
   margin: 40px auto;
-  color: #C08E3D;
+  color: #2e1710;
 }
 .login-screen-content .list-block .item-title.label {
   width: 15%;
   -webkit-flex-shrink: 0;
   -ms-flex: 0 0 auto;
   flex-shrink: 0;
-  color: #C08E3D !important;
-}
-.login-screen-content .thumbnail {
-  background: transparent;
-  text-align: center;
-  padding: 0px 30px;
-  margin-top: 35%;
-  border-top-left-radius: 100%;
-  border-top-right-radius: 100%;
-  border-bottom-left-radius: 100%;
-  border-bottom-right-radius: 100%;
-  box-sizing: border-box;
-}
-.login-screen-content .thumbnail img {
-  width: 70%;
+  color: #2e1710 !important;
 }
 .login-screen-content form {
+  display: table-cell;
+  vertical-align: middle;
   position: relative;
   z-index: 1;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.5);
+  -webkit-box-shadow: 0px 0px 26px -3px #2e1710;
+  -moz-box-shadow: 0px 0px 26px -3px #2e1710;
+  box-shadow: 0px 0px 26px -3px #2e1710;
   max-width: 300px;
   margin: 0 auto 100px;
+  padding: 10px;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
   text-align: center;
 }
-.login-screen-content form .item-inner {
-  background: #f2f2f2 !important;
+.login-screen-content form .thumbnail {
+  background: transparent;
+  padding: 25px;
+  border-top-left-radius: 100%;
+  border-top-right-radius: 100%;
+  border-bottom-left-radius: 100%;
+  border-bottom-right-radius: 100%;
+  box-sizing: border-box;
 }
-.login-screen-content form .list-block .item-content {
-  padding-left: 0px;
+.login-screen-content form .thumbnail img {
+  display: block;
+  width: 100%;
 }
 .login-screen-content form input {
   outline: 0;
@@ -69,18 +70,14 @@
   font-size: 14px;
 }
 .login-screen-content form a:active {
-  background: #C08E3D !important;
+  background: #2e1710 !important;
 }
 .login-screen-content form .button {
   font-size: 17px;
   font-weight: bold;
-  border: 2px solid #C08E3D;
-  color: #fff;
+  border: 1px solid #2e1710;
 }
 .login-screen-content form .button.active {
-  background: rgba(192, 142, 61, 0.8);
-  color: #fff !important;
-}
-.login-screen-content form .button.active-state {
-  color: #fff !important;
+  background: rgba(46, 23, 16, 0.8);
+  color: #fff;
 }

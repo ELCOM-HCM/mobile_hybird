@@ -11,25 +11,31 @@ import Cookie from "react-cookie";
 import FWPlugin from ".././common/app.plugin";
 import ReactDOM from "react-dom";
 import Common from  ".././common/app.common";
-
+import Widget from '.././common/app.widget';
+import { Redirect } from 'react-router';
+//import {Link} from 'react-router-dom';
+//import Widget from '.././common/app.widget';
 class Login extends React.Component{
 	constructor(props) {
 		super(props);
-	}
-	componentWillMount() {
-		console.log('Welcome to login screen');
-		// auto login
-		if(Cookie.load('user') != undefined){
-			this.login();
+		this.state = {
+			redirectToReferrer: false
 		}
 	}
+	async componentWillMount() {
+		Common.logs('CHECK LOGIN');
+		let status = await Common.requestAsync({url: '/checkLogin',type: 'POST'});
+		if(status && Cookie.load("user") != undefined){
+			this.setState({redirectToReferrer: status});
+		}
+		
+	}
 	componentDidMount(){
-
 	}
 	login(){
+	    var _=this;
 		var username = $(ReactDOM.findDOMNode(this.refs.username)).val() || (Cookie.load("user") == undefined? "": Cookie.load("user").username);
 		var password = $(ReactDOM.findDOMNode(this.refs.password)).val() || (Cookie.load("user") == undefined? "": Cookie.load("user").password);
-		console.log(username + password);
 		if(username == "" && password == ""){
 			return;
 		}
@@ -42,15 +48,16 @@ class Login extends React.Component{
 			Common.logs(res);
 			// check login
 			if(res.status){
-				if(Cookie.load("user") == undefined){
-					var date = new Date();
-					date.setFullYear(date.getFullYear() + 10); // set expires 10 year
-					Cookie.save("user", JSON.stringify({username: username, password: password}), {expires: date});
-				}
+				var date = new Date();
+				date.setFullYear(date.getFullYear() + 10); // set expires 10 year
+				Cookie.save("user", JSON.stringify({username: username, password: password, user_id: res.user.user_id, fullname: res.user.fullname}), {expires: date});
 				Common.user = res.user;
+				Widget.callAndroid({cmd:'set', key:'USER_ID', value: Common.user.user_id});
+				console.log(">SEND USER_ID " + Common.user.user_id);
+				_.setState({redirectToReferrer: true});
 			} else {
 				FWPlugin.modal({
-					title: 'eSMILE PORTAL',
+					title: 'ESMILE',
 					text: '<p class="color-red"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> LOGIN FAIL</p>', 
 					buttons: [
 					     {text: '<span class="color-red"><i class="ios-icons">close</i> close</span>', bold: true}
@@ -61,14 +68,19 @@ class Login extends React.Component{
 		return false;
 	}
 	render(){
+		const { redirectToReferrer } = this.state;
+		const _=this;
+		if (redirectToReferrer) {
+      		return <Redirect to="/hotel" />;
+    	}
 		return(
-			<div>
+			<div style={{'display': (redirectToReferrer?'none':'block')}}>
 				<div data-page="login-screen" className="page no-navbar no-toolbar no-swipeback">
 				  <div className="page-content login-screen-content">
-				    <div className="thumbnail">
-				      	<img src="styles/images/logo.png" />
-				     </div>
-				    <form>
+					<form>
+				      <div className="thumbnail">
+				      	<img src="/styles/images/logo.png" />
+				      </div>
 				      <div className="list-block">
 				        <ul>
 				          <li className="item-content">
@@ -87,7 +99,11 @@ class Login extends React.Component{
 				          		<i className="ios-icons">lock</i>
 				          	  </div>
 				              <div className="item-input">
-				                <input type="password" ref="password" name="password" placeholder="Password"/>
+				                <input onKeyPress={(e)=>{
+				                	if(e.key == 'Enter') {
+								        _.login();
+								    }
+				                }} type="password" ref="password" name="password" placeholder="Password"/>
 				              </div>
 				            </div>
 				          </li>
@@ -97,7 +113,7 @@ class Login extends React.Component{
 				        <ul>
 				          <li>
 				          	<p>
-				          		<a href="#" onClick={this.login.bind(this)} className="button button-round button-big"><i className="ios-icons">login</i> LOGIN</a>
+				          		<a href="#" onClick={this.login.bind(this)} className="button button-round active"><i className="ios-icons">login</i> Login</a>
 				          	</p>  
 				          </li>
 				        </ul>

@@ -10,3 +10,4 @@ var ELC = {
 			return ELC.TRANSPORTER;
 		}
 }
+export default ELC;
