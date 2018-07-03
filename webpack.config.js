@@ -2,7 +2,6 @@ var webpack = require('webpack');
 var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CleanWebpackPlugin = require('clean-webpack-plugin');
-const dist = path.resolve(__dirname, 'www');
 module.exports = {
   entry: [
     'webpack-hot-middleware/client?reload=true',
