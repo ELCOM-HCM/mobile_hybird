@@ -1,14 +1,14 @@
 {
-  "name": "react-node-starter",
+  "name": "esmile-tmv-project",
   "version": "0.2.0",
   "description": "an example for deploying a React + NodeJS app to Heroku",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server_19091.js",
+    "start": "node server_19095.js",
     "postinstall": "webpack -p --config webpack.prod.config.js"
   },
-  "author": "",
+  "author": "dangtm",
   "license": "ISC",
   "dependencies": {
     "babel-core": "^6.7.6",
@@ -26,6 +26,8 @@
     "express": "^4.13.4",
     "express-logger": "0.0.3",
     "express-session": "^1.15.6",
+    "framework7-react": "^3.0.0-beta.18",
+    "highcharts": "^6.1.1",
     "moment": "^2.22.1",
     "morgan": "^1.9.0",
     "node-sass": "^3.4.2",
@@ -35,11 +37,14 @@
     "react-charts": "^1.0.7",
     "react-cookie": "^1.0.5",
     "react-dom": "^15.0.1",
+    "react-easy-chart": "^1.0.0",
+    "react-jsx-highcharts": "^3.1.0",
     "react-render-html": "^0.6.0",
     "react-router-dom": "^4.2.2",
     "react-scroll": "^1.7.9",
     "react-simple-charts": "0.0.19",
     "react-trend": "^1.2.4",
+    "recharts": "^1.0.1",
     "sass-loader": "^3.2.0",
     "socket.io": "^2.1.1",
     "style-loader": "^0.13.1",
@@ -52,5 +57,17 @@
     "webpack-dev-middleware": "^1.6.1",
     "webpack-dev-server": "^1.16.5",
     "webpack-hot-middleware": "^2.10.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ELCOM-HCM/mobile_hybird.git"
+  },
+  "keywords": [
+    "esmile",
+    "elcom"
+  ],
+  "bugs": {
+    "url": "https://github.com/ELCOM-HCM/mobile_hybird/issues"
+  },
+  "homepage": "https://github.com/ELCOM-HCM/mobile_hybird#readme"
 }

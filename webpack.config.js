@@ -2,9 +2,9 @@ var webpack = require('webpack');
 var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CleanWebpackPlugin = require('clean-webpack-plugin');
-const dist = path.resolve(__dirname, 'www');
 module.exports = {
   entry: [
+	'webpack-hot-middleware/client?reload=true',
     'babel-polyfill', './src/esmile_mobile',
     './src/common/app.plugin'
     
@@ -17,13 +17,6 @@ module.exports = {
     ]
   },
   rules:[
-       /* {
-            test:/\.(s*)css$/,
-            use: ExtractTextPlugin.extract({ 
-                fallback: 'style-loader',
-                use: ['css-loader','sass-loader']
-            })
-        },*/
         {
             test: /\.(png|jp(e*)g|svg)$/,  
             use: [{
@@ -56,7 +49,7 @@ module.exports = {
     // 0.0.0.0 is available to all network devices
     // unlike default `localhost`.
     host: process.env.HOST, // Defaults to `localhost`
-    port: 19091,//process.env.PORT, // Defaults to 8080
+    port: process.env.PORT, // Defaults to 8080
     open: true, // Open the page in browser
     watchContentBase: true,
     hot: true
@@ -64,7 +57,6 @@ module.exports = {
   plugins: [
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.NamedModulesPlugin(),
-   // new CleanWebpackPlugin([dist]),
     new HtmlWebpackPlugin({
         title: 'Hot Module Reload',
         filename: 'esmile_mobile.html'

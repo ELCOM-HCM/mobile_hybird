@@ -14,26 +14,62 @@ class NPS extends Component{
 	constructor(props) {
 		super(props);
 		this.state = {
-			location:[],
+			store:[],
 			chart: null,
 			nps:[
-				{id: 1, name: 'PROMOTERS', score: '0-6', respondent: 5, image: "nps_1.png"}, 
-				{id: 2, name: 'PASSIVES', score: '7-8', respondent: 5, image: "nps_3.png"},
-				{id: 3, name: 'DETRACTORS', score: '9-10', respondent: 5, image: "nps_2.png"}
+			     {
+			    	 id: 1,
+			    	 title: "Ban co hai long ve chat luong dich vu tai Viet Han khong",
+			    	 type: "1",
+			    	 data:[{id: 1, name: 'EXCELLENT', score: 10, respondent: 5, image:  ''}, 
+							{id: 2, name: 'GOOD', score: 8, respondent: 5, image:  ''},
+							{id: 3, name: 'AVERAGE', score: 6, respondent: 5, image: "Average.png"},
+							{id: 4, name: 'POOR', score: 4, respondent: 5, image:  "Poor.png"},
+							{id: 5, name: 'OTHER', score: 0, respondent: 5, image: "Other.png"}]
+			     },
+			     {
+			    	 id: 2,
+			    	 title: "Ket qua tham my",
+			    	 type: "1",
+			    	 data:[{id: 1, name: 'EXCELLENT', score: 10, respondent: 5, image:  "Excellent.png"}, 
+							{id: 2, name: 'GOOD', score: 8, respondent: 5, image:  "Good.png"},
+							{id: 3, name: 'AVERAGE', score: 6, respondent: 5, image: "Average.png"},
+							{id: 4, name: 'POOR', score: 4, respondent: 5, image:  "Poor.png"},
+							{id: 5, name: 'OTHER', score: 0, respondent: 5, image: "Other.png"}]
+			     },
+			     {
+			    	 id: 3,
+			    	 title: "Phi dich vu tai Viet Han",
+			    	 type: "1",
+			    	 data:[{id: 1, name: 'EXCELLENT', score: 10, respondent: 5, image:  "Excellent.png"}, 
+							{id: 2, name: 'GOOD', score: 8, respondent: 5, image:  "Good.png"},
+							{id: 3, name: 'AVERAGE', score: 6, respondent: 5, image: "Average.png"},
+							{id: 4, name: 'POOR', score: 4, respondent: 5, image:  "Poor.png"},
+							{id: 5, name: 'OTHER', score: 0, respondent: 5, image: "Other.png"}]
+			     },
+			     {
+			    	 id: 4,
+			    	 title: "Ban co muon gioi thieu ban be khong",
+			    	 data:[{id: 1, name: 'YES', score: 10, respondent: 5, image:  "yes.png"}, 
+							{id: 2, name: 'NO', score: 8, respondent: 5, image:  "no.png"},
+						],
+					type: "2"
+			     }
 			],
 			nps_trend:[{date: 'dd-mm-yyyy', value: 10}, {date: 'dd-mm-yyyy', value: 20}, {date: 'dd-mm-yyyy', value: 2}],
-			nps_num: 0
+			nps_num: 0,
+			overview: []
 		}
 	}
 	componentWillMount(){
 	}
 	async componentDidMount(){
-		let location = await Common.requestAsync({type:'GET', url: API.getLocation()});
-		this.setState({location: location});
-		this.getNPS();
-        setInterval(this.getNPS.bind(this), 3000);
+		let store = await Common.requestAsync({type:'GET', data:{id: Common.user == null? '-1' : Common.user.user_id}, url: API.getStore()});
+		this.setState({store: store});
+		this._getNPS();
+        //setInterval(this.getNPS.bind(this), 3000);
 	}
-	async getNPS(){
+	async _getNPS(){
 		let location = [];
 		$('.list-room input:checkbox').each(function () {
 			if ($(this).is(':checked')) {
@@ -45,17 +81,15 @@ class NPS extends Component{
 		var opt = {
 				date_from: from, 
 				date_to: to, 
-				location: location, 
-				lang_id: Common.lang_id
+				store_id: location
 		};
-		let data = await Common.requestAsync({type:'GET', url: API.getNPS(), data:opt});
-		console.log(data);
+		let data = await Common.requestAsync({type:'GET', url: API.getRatingService(), data:opt});
 		if(this.refs.nps){
-			this.setState({nps:data.data_nps.reverse(), nps_trend: data.nps_trend, nps_num: data.nps});
+			this.setState({nps:data});
 		}
-		return data;
+		this._getOverview();
 	}
-	async getOverview(){
+	async _getOverview(){
 		let location = [];
 		$('.list-room input:checkbox').each(function () {
 			if ($(this).is(':checked')) {
@@ -67,165 +101,129 @@ class NPS extends Component{
 		var opt = {
 				date_from: from, 
 				date_to: to, 
-				location: location, 
-				lang_id: Common.lang_id
+				store: this.state.store.map(x=>x.id), 
+				langid: Common.lang_id
 		};
-		let data = await Common.requestAsync({type:'GET', url: API.getOverview(), data:opt});
-		return data;
+		let data = await Common.requestAsync({type:'GET', url: API.getServiceOverview(), data:opt});
+		let arrPercent = data.map(x=>{
+			let obj = {
+					name: x.rating_name,
+					data:[]
+			};
+			for(let i = 0; i < x.data.length; i++){
+				let tmp = {
+						name: x.data[i].name + " Sao",
+						y: 0
+				};
+				if(Number(x.data[i].sum) > 0){
+					tmp.y = Number(x.data[i].num)*100/Number(x.data[i].sum);
+				}
+				obj.data.push(tmp);
+			}
+			return obj;
+		});
+		//this.setState({overview: arrPercent});
+		for(let i = 0; i < arrPercent.length; i++){
+			this._drawChart('chart_' + i, arrPercent[i].data);
+		}
 	}
-	draw(){
-		let _=this;
-		var gaugeOptions = {
+	_drawChart(container, data){
+		Highcharts.chart(container, {
 		    chart: {
-		        type: 'solidgauge',
-		        backgroundColor: null
+		        plotBackgroundColor: null,
+		        plotBorderWidth: null,
+		        plotShadow: false,
+		        type: 'pie',
+		        backgroundColor: 'rgba(255,255,255,0)'
 		    },
-		
-		    title: null,
-		
-		    pane: {
-		        center: ['50%', '85%'],
-		        size: '140%',
-		        startAngle: -90,
-		        endAngle: 90,
-		        background: {
-		            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || '#EEE',
-		            innerRadius: '60%',
-		            outerRadius: '100%',
-		            shape: 'arc'
-		        }
+		    title: {
+		        text: ''
 		    },
-		
 		    tooltip: {
-		        enabled: false
+		        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
 		    },
-		
-		    // the value axis
-		    yAxis: {
-		        stops: [
-		            [0.1, '#DF5353'], // green
-		            [0.5, '#DDDF0D'], // yellow
-		            [0.9, '#55BF3B'] // red
-		        ],
-		        lineWidth: 0,
-		        minorTickInterval: null,
-		        tickAmount: 2,
-		        title: {
-		            y: -70
-		        },
-		        labels: {
-		            y: 16
-		        }
-		    },
-		
 		    plotOptions: {
-		        solidgauge: {
-		            dataLabels: {
-		                y: 5,
-		                borderWidth: 0,
-		                useHTML: true
-		            }
-		        }
-		    }
-		};
-		let chart = Highcharts.chart('container', Highcharts.merge(gaugeOptions, {
-		    yAxis: {
-		        min: -100,
-		        max: 100,
-		        title: {
-		            text: ''
+		    	 pie: {
+		             allowPointSelect: true,
+		             cursor: 'pointer',
+		             dataLabels: {
+		                 enabled: false
+		             },
+		             showInLegend: true
+		         }
+		    },
+		    legend: {
+		        layout: 'vertical',
+		        align: 'right',
+		        verticalAlign: 'middle',
+		        itemStyle: {
+		               color: '#fff'
 		        }
 		    },
-		
-		    credits: {
-		        enabled: false
-		    },
-		
 		    series: [{
 		        name: '',
-		        data: [_.state.nps_num],
-		        dataLabels: {
-		            format: '<div style="text-align:center"><span style="font-size:25px;color:' +
-		                ((Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black') + '">{y}</span><br/>' +
-		                   '<span style="font-size:12px;color:silver">score</span></div>'
-		        },
-		        tooltip: {
-		            valueSuffix: ' SCORE'
-		        }
+		        data: data
 		    }]
-		
-		}));
-
-		//this.setState({chart: chart});
-		return chart;
+		});
 	}
 	render(){
-		const {nps} = this.state;
-		const {nps_trend} = this.state;
-		const {nps_num} = this.state;
+		const {nps,nps_trend,nps_num} = this.state;
+		function _renderSmile(data, type){
+			return (
+				data.map(function(item, index){
+					return(
+						<div className={type==1?"col-20":"col-50"} key={item.id + '__star'}>
+							<div style={{"textAlign": "center", "marginTop": "3px"}}>
+								{
+									type=="1"?(<img width="45px" src={`/styles/images/${index+1}.png`}/>) : 
+									(<img style={{width:'30px', height: '30px', 'borderRadius': '50%'}} src={`/styles/images/${index+1}_.png`}/>)
+								}
+								
+							</div>
+							<p style={{"textAlign": "center","margin": "0px","color": "#fff"}}>{item.respondent}</p>
+						</div>
+					)
+				},this)
+			)
+		}
 		return (
 			<div style={{'height': '100%'}}>
 				<User />
 				<div className="views tabs toolbar-through">
-					<Picker location={this.state.location} callback={this.getNPS.bind(this)}/>
+					<Picker location={this.state.store} callback={this._getNPS.bind(this)}/>
 					<div id="nps" className="view tab active">
 						<div className="navbar-through">
-							<Header name="NET PROMOTER SCORE"/>
+							<Header name="SERVICE RATING"/>
 							<div className="page" data-page="">
 								<div className="page-content" data-ptr-distance="50">
 									<div className="row">
-										<div className="col-60">
+										<div className="col-100">
 											<div ref="nps" className="list-block media-list">
 												<ul>
 												      {nps.map(function(item, index){
 															return(
-																	<li key={item.id + '__nps'}>
-																      <div className="item-content">
-																        <div className="item-media">
-																        	<img width="30px" src={API.getPathContent() + item.image}/>
-																        </div>
-																        <div className="item-inner">
-																          <div className="item-title-row">
-																            <div className="item-title">{(parseInt(item.score) > 8)?'Promoters':(parseInt(item.score) < 7?'Detractors':'Passives')}</div>
-																          </div>
-																          <div className="item-subtitle">
-																          	<span>
-																          		<i className="fa fa-star" aria-hidden="true"></i> 
-																          		{item.score}
-																          	</span>
-																          	<span>
-																          		<i className="fa fa-share-square" aria-hidden="true"></i> 
-																          		{item.respondent}
-																          	</span>
-																          </div>
-																        </div>
-																      </div>
-																    </li>
+																<li key={item.id + '__nps'}>
+															      <div className="item-content">
+															        <div className="item-inner">
+															          <div className="item-title-row">
+															            <div className="item-title" style={{"whiteSpace": "normal"}}>{item.title}</div>
+															          </div>
+															          <div className="item-subtitle">
+																          <div className="row">
+															          	   	{_renderSmile(item.data, item.type)}
+															          	 </div>
+															          </div>
+															        </div>
+															      </div>
+															      <div id={`chart_${index}`} style={{minWidth: "100px", "height": "200px", "maxWidth": "600px","margin": "0 auto"}}></div>
+															    </li>
 															)
 														}, this)}
 												  </ul>
 										    </div>
 										</div>
-										<div className="col-40" style={{'textAlign':"center", 'marginTop': '10%'}}>
-											
-											<CirclePie width={100} height={100} label="NPS" labelColor='#408AE5' percent={nps_num}/>
-										</div>
 									</div>
-									<div className="content-block">
-										 <p style={{'color':'#fff'}}>NPS Trend</p>
-										 <Trend
-										    smooth
-										    autoDraw
-										    autoDrawDuration={3000}
-										    autoDrawEasing="ease-out"
-										    data={nps_trend}
-										    gradient={['#42b3f4']}
-										    radius={12}
-										    strokeWidth={3}
-										    strokeLinecap={'square'}
-										  />
-										 
-									</div>
+									<div className="content-block" id="chart_overview"></div>
 								</div>
 							</div>
 						</div>

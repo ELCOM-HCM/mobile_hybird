@@ -1,8 +1,8 @@
 import Common from './app.common';
 var eAPI = {
-	ip: 'demo.e-smile.vn',
-	port:'3000',
-	context: '/farm_labiang'
+	ip: 'esmile.e-smile.vn',
+	port:'3001',
+	context: '/tmv'
 }
 eAPI.getPathContent = function(){
 	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/content/');
@@ -10,45 +10,76 @@ eAPI.getPathContent = function(){
 eAPI.login = function(){
 	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/tablet/login');
 }
-eAPI.location = function(){
-		return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/tablet/location?id=' + Common.user.id);
-}
 eAPI.register = function(type){
 	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/tablet/register');
 }
-eAPI.smile = function(){
-	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/tablet/smile');
-}
-eAPI.rating = function(){
-	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/tablet/rating');
-}
-eAPI.comment= function(){
-	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/tablet/comment');
-}
-eAPI.info = function(){
-	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/tablet/info');
-}
+
+
 // api for mobile phone
-eAPI.getLocation = function(){
-	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/location?id=' + Common.user.user_id);
+
+/**
+ * input {id: "user_id"}
+ */
+eAPI.getStore = function(){
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/store');
 }
+/**
+ * input {id: "store id"}
+ */
+eAPI.getLocation = function(){
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/location');
+}
+/**
+ * input {location: [1,2,3]}
+ */
 eAPI.getEmployee = function(){
 	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/employee');
 }
+/**
+ * input {key:'-1', lang_id: 1, type: 1}
+ */
+eAPI.info = function(){
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/tablet/info');
+}
+/**
+ * input {employee:['1', '2', '3'], location:['1', '2', '3'], date_from: 'dd-mm-yyyy hh:mm', date_to: 'dd-mm-yyyy hh:mm',langid:''}
+ */
+eAPI.getRatingByEmployee = function(){
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/data/overview');
+}
+/**
+ * input {date_from: 'dd-mm-yyyy hh:mm', date_to: 'dd-mm-yyyy hh:mm', employee:['1', '2', '3'], location:['1','2']}
+ */
+eAPI.getRatingEmployee = function(){
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/mobile/ratingEmployee');
+}
+/**
+ * input {date_from: 'dd-mm-yyyy hh:mm', date_to: 'dd-mm-yyyy hh:mm', store_id:['1', '2', '3']}
+ */
+eAPI.getRatingService = function(){
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/mobile/ratingService');
+}
+/**
+ * input {id: 'smile id', filter:['1', '2', '3'], date_from: 'dd-mm-yyyy hh:mm', date_to: 'dd-mm-yyyy hh:mm', langid:'', type: 'location/employee/store'}
+ * filter is id of type
+ */
+eAPI.getComment = function(){
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/smile/comment');
+}
+/**
+ * input {employee:['1', '2', '3'], date_from: 'dd-mm-yyyy hh:mm', date_to: 'dd-mm-yyyy hh:mm', langid:''}
+ */
+eAPI.getStatisticEmpl = function(){
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/employee/smile/statistic');
+}
+/**
+ * input {store:['1', '2', '3'], date_from: 'dd-mm-yyyy hh:mm', date_to: 'dd-mm-yyyy hh:mm',langid:''}
+ */
+eAPI.getServiceOverview = function(){
+	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/service/overview');
+}
 eAPI.getEmployeeCompare = function(){
 	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/employee/compare');
-}
-eAPI.getSmile = function(){
-	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/smile');
-}
-eAPI.getRating = function(){
-	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/rating/all');
-}
-eAPI.getRatingById = function(){
-	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/rating');
-}
-eAPI.getSurvey = function(){
-	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/survey/vote');
 }
 eAPI.getNotify = function(){
 	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/mobile/notify/all');
@@ -59,16 +90,6 @@ eAPI.deleteNotify = function(){
 eAPI.deleteNotifyAll = function(){
 	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/mobile/notify/delete/all');
 }
-eAPI.getRatingDetail = function(){
-	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/csat/detail');
-}
-eAPI.getCSAT = function(){
-	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/mobile/csat');
-}
-eAPI.getNPS = function(){
-	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/mobile/nps');
-}
-eAPI.getOverview = function(){
-	return 'http://'.concat(eAPI.ip, ':', eAPI.port, eAPI.context, '/overview/cast/nps');
-}
+
+
 export default eAPI;

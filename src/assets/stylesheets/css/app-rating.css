@@ -1,5 +1,5 @@
 img.logo {
-  width: 65px;
+  width: 45px;
 }
 .languages i {
   font-size: 25px;
@@ -121,7 +121,7 @@ img.logo {
 #csat .list-block .item-title,
 #nps .list-block .item-title {
   color: rgba(255, 255, 255, 0.8);
-  font-size: 15px;
+  font-size: 12px;
 }
 #csat .list-block span,
 #nps .list-block span {

@@ -13,6 +13,7 @@ import Header from './Header.js';
 import User from './PannelUser';
 import Tabbar from './Tabbar';
 import FWPlugin from '.././common/app.plugin';
+import renderHTML from 'react-render-html';
 class Notify extends React.Component {
 	constructor(props) {
 		super(props);
@@ -24,9 +25,9 @@ class Notify extends React.Component {
     	
     }
     componentDidMount(){
-    	this.checkNotify();
+    	this._checkNotify();
     }
-    checkNotify(){
+    _checkNotify(){
     	Common.request({url:API.getNotify(), 
     			data: {user_id: Common.user == null? '-1' : Common.user.user_id}, 
     			type: 'GET'}, function(res){
@@ -83,19 +84,18 @@ class Notify extends React.Component {
 	   	  };
 		 Common.request({url: API.deleteNotify(), data: obj, type: 'GET'}, function(response){
 			 if(response.status == "1"){
-				 _.checkNotify();
+				 _._checkNotify();
 			 }
 		 });
 		});
 	}
-    rederHTML(obj){
-//		var badge = <span className="badge bg-yellow">{obj.type}</span>;
+    _renderHTML(obj){
     	var badge = <span className="badge color-green"></span>;
     	var time = <div className="item-text">
 						<i className="fa fa-calendar" aria-hidden="true"></i> {obj.time}
 					</div>;
     	var location = <div className="item-text">
-							<i className="fa fa-map-marker" aria-hidden="true"></i> {obj.location}
+							<i className="fa fa-map-marker" aria-hidden="true"></i> {renderHTML(obj.location)}
 				       </div>;
 		if(obj.status == 1){
     		badge = <span className="badge"></span>;
@@ -112,7 +112,7 @@ class Notify extends React.Component {
 				   <a href="#" className="item-content item-link">
 				     <div className="item-inner">
 				        <div className="item-title-row">
-				          <div className="item-title">{obj.name} </div>
+				          <div className="item-title" style={{"whiteSpace": "normal"}}>{renderHTML(obj.name)} </div>
 				          <div className="item-after">
 								{badge}
 				          </div>
@@ -142,7 +142,7 @@ class Notify extends React.Component {
 	   	  };
 		 Common.request({url: API.deleteNotifyAll(), data: obj, type: 'GET'}, function(response){
 			 if(response.status == "1"){
-				 _.checkNotify()
+				 _._checkNotify()
 			 }
 		 });
 		});
@@ -159,7 +159,7 @@ class Notify extends React.Component {
 				            <div className="page-content">
 				              <div className="list-block media-list">
 								  <ul ref="refNotify">
-								  	{this.state.notifications.map(this.rederHTML, this)}
+								  	{this.state.notifications.map(this._renderHTML, this)}
 								  </ul>
 								</div>
 				            </div>

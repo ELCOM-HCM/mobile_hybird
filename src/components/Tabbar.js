@@ -15,9 +15,9 @@ class Tabbar extends React.Component{
 	componentWillMount() {
 	}
 	componentDidMount(){
-		setInterval(this.getNotify.bind(this), 3000);
+		setInterval(this._getNotify.bind(this), 5000);
 	}
-	getNotify(){
+	_getNotify(){
 		Common.request({url:API.getNotify(), 
     			data: {user_id: Common.user == null? '-1' : Common.user.user_id}, 
     			type: 'GET'}, function(res){
@@ -40,19 +40,19 @@ class Tabbar extends React.Component{
 				<div className="toolbar-inner" ref="tabbar">
 					<Link to={'/csat'} replace className={this.props.index == "1"? "tab-link active": "tab-link"}> 
 					 <i className="fa fa-2x fa-smile-o"></i>
-					 <span className="tabbar-label">CSAT</span>
+					 <span className="tabbar-label">EMPLOYEE</span>
 					</Link>
 					<Link to={'/nps'} replace className= {this.props.index == "2"? "tab-link active": "tab-link"}> 
 						<i className="fa fa-tachometer" style={{fontSize: '27px'}} aria-hidden="true"></i>
-						<span className="tabbar-label">NPS</span>
+						<span className="tabbar-label">SERVICE</span>
 					</Link>
 					<Link to={'/comment'} replace className= {this.props.index == "3"? "tab-link active": "tab-link"}> 
 						<i className="fa fa-commenting" style={{fontSize: '27px'}} aria-hidden="true"></i>
-						<span className="tabbar-label">RESPONDENTS</span>
+						<span className="tabbar-label">COMMENTS</span>
 					</Link>
 					<Link to={'/notify'} replace id="num_notify" className={this.props.index == "4"? "tab-link active": "tab-link"}> 
 						<i className="ios-icons icons-bell">bell_fill<span className={num_notify > 0 ? "badge bg-red":"badge bg-red hidden"}>{num_notify}</span></i><span
-						className="tabbar-label">NOTIFICATION</span></Link>
+						className="tabbar-label">NOTIFICATIONS</span></Link>
 				</div>
 			</div>
 		);

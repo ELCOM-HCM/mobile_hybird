@@ -54,7 +54,7 @@ module.exports = function(passport) {
 //		} else {
 //			return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
 //		}
-		request.post('http://demo.e-smile.vn:3000/farm_labiang/login', {form: {username: username, password: password}}, 
+		request.post('http://demo.e-smile.vn:3000/tmv/login', {form: {username: username, password: password}}, 
 				function(error, response, body){
 					if(error){
 						return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
@@ -67,7 +67,7 @@ module.exports = function(passport) {
 									user_id: data.user_id,
 									fullname : data.name,
 								}
-								common.log('call http://demo.e-smile.vn:3000/farm_labiang/login');
+								common.log('call http://esmile.e-smile.vn:3001/tmv/login');
 								return done(null, user);
 						} else {
 							return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));

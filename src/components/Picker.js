@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import FWPlugin from '.././common/app.plugin';
 import API from '.././common/app.api';
 import Common from '.././common/app.common';
+import renderHTML from 'react-render-html';
 class Picker extends React.Component{
 	constructor(props) {
 		super(props); 
@@ -74,7 +75,7 @@ class Picker extends React.Component{
 									       <i className="icon icon-form-checkbox"></i>
 									     </div>
 									     <div className="item-inner">
-									       <div className="item-title">{item.name}</div>
+									       <div className="item-title">{renderHTML(item.name)}</div>
 									     </div>
 								   </label>
 								 </li>

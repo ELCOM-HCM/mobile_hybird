@@ -40,19 +40,6 @@ $$('.pull-to-refresh-content').on('ptr:refresh', function(e){
 		FWPlugin.pullToRefreshDone();
 	}, 1000);
 });
-
-//  FWPlugin.onPageInit('rating', function(page){
-//	var date = Common.getLast30Days();
-//	var today = new Date();
-//	$$('#date-from').val(moment().subtract('days', 30).format('YYYY-MM-DD'));
-//	$$('#date-to').val(moment().format('YYYY-MM-DD'));
-//	$$('#date-from').attr(
-//			   "data-date", 
-//			   moment().subtract('days', 30).format( $$('#date-from').attr("data-date-format") ));
-//	$$('#date-to').attr(
-//			   "data-date", 
-//			   moment().format( $$('#date-from').attr("data-date-format") ));
-//});
 FWPlugin.init();
 
 

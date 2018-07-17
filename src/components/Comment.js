@@ -26,11 +26,12 @@ class Comment extends Component{
 		
 	}
 	async componentDidMount(){
-		let location = await Common.requestAsync({type:'GET', url: API.getLocation()});
-		this.setState({location: location});
-		this.getComment();
+		let location = await Common.requestAsync({type:'GET', data:{key:'-1', lang_id: 1, type: 1}, url: API.info()});
+		this.setState({location: location.locations});
+		this._getComment();
 	}
-	async getComment(){
+	async _getComment(){
+		let _=this;
 		let location = [];
 		$('.list-room input:checkbox').each(function () {
 			if ($(this).is(':checked')) {
@@ -39,48 +40,50 @@ class Comment extends Component{
 		 });
 		let from = $('.date-from').attr('data-date') + ' 06:00';
 		let to = $('.date-to').attr('data-date') + ' 23:00';
+		let employee = await Common.requestAsync({type:'GET', data:{location: location}, url: API.getEmployee()});
+		let emplId = employee.map(x=>x.id);
 		var opt = {
 				date_from: from, 
 				date_to: to, 
-				location: location, 
-				langid: Common.lang_id
+				filter: emplId,
+				id: '5',
+				langid:'1',
+				type:'employee'
 		};
-		let comment = [];
-		comment = await Common.requestAsync({type:'GET', url: API.getRatingDetail(), data: opt});
-		this.setState({rating: comment});
-		let height = 0;
-		$('#messages .message').each(function(){
-			height+= parseInt($(this).height());
-		});
-		$('#messages').scrollTop(1000);
-	
-		return comment;
+		let comment = await Common.requestAsync({type:'GET', url: API.getComment(), data: opt});
+		console.log(comment);
+		if(this.refs.comment){
+			this.setState({rating: comment});
+		}
 	}
 	render(){
+		const {rating} = this.state;
 		return(
 			<div style={{'height': '100%'}}>
 				<User />
 				<div className="views tabs toolbar-through">
-					<Picker location={this.state.location} callback={this.getComment.bind(this)}/>
+					<Picker location={this.state.location} callback={this._getComment.bind(this)}/>
 					<div id="comment" className="view tab active">
 						<div className="navbar-through">
 							<Header name="RESPONDENTS" logo={this.props.logo}/>
 							<div className="page" data-page="">
 								<div className="page-content messages-content">
-									<div id="messages" className="messages">
+									<div ref="comment" id="messages" className="messages">
 								      {/*<!-- Messages title -->*/}
 								      {/*<div className="messages-title"><b>Sunday, Feb 9,</b> 12:58</div>*/}
 								      {/*<!-- Full layout sent message -->*/}
-								      {this.state.rating.map(function(item, index){
+								      {rating.map(function(item, index){
 									      return(
 									      	 <div key={"rating__" + index} className="message message-received message-first message-last message-tail">
-										        <div className="message-avatar" ></div>
+										      	{/*<div className="message-avatar"></div>*/}
 										        <div className="message-content">
-										          {/*<div className="message-name">{item.store_name}</div>*/}
-										          <div className="message-header">{renderHTML(item.store_name)}</div>
+										          <div className="message-name">
+										          	<i className="fa fa-user" aria-hidden="true"></i> {item.employee}</div>
+										          <div className="message-header">
+										          	<i className="fa fa-map-marker" aria-hidden="true"></i> {renderHTML(item.location)}</div>
 										          <div className="message-bubble">
-										            <div className="message-text-header">{renderHTML(item.smile_name)}</div>
-										            <div className="message-text">{renderHTML(item.rating)}</div>
+										            <div className="message-text-header">{renderHTML(item.rating)}</div>
+										            <div className="message-text">{renderHTML(item.comment || "")}</div>
 										            <div className="message-text-footer">{item.date}</div>
 										          </div>
 										          {/*<div className="message-footer">Message footer</div>*/}

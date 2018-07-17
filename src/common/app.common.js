@@ -109,7 +109,7 @@ eCommon.logs = function(str){
 	console.log('>>>>>______DangTM ELCOM log_____>>>> ' + this.getTime() + ': ' + str);
 	
 }
-eCommon.request = function(obj, success, error){
+eCommon.request = function(obj, success, error) {
 	$.ajax({
 			url: obj.url,
 			type: obj.type || 'GET',

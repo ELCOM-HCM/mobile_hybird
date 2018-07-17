@@ -1,7 +1,8 @@
 var path = require('path');
 var express = require('express');
 var app = express();
-var PORT = process.env.PORT || 19091;  
+var PORT = process.env.PORT || 19095;  
+var server = require('http').createServer(app);  
 var io = require('socket.io')(server);
 var flash    = require('connect-flash');
 var bodyParser = require('body-parser');
@@ -25,7 +26,6 @@ if(process.env.NODE_ENV !== 'production') {
   var webpackHotMiddleware = require('webpack-hot-middleware');
   var webpack = require('webpack');
   var config = require('./webpack.config');
- // config.entry.app.unshift("webpack-dev-server/client?http://localhost:19091/");
   var compiler = webpack(config);
   app.use(webpackDevMiddleware(compiler, { }));
   app.use(webpackHotMiddleware(compiler));
@@ -51,18 +51,11 @@ app.use('/styles', express.static(path.join(__dirname, 'src/assets/stylesheets')
 app.use('/common', express.static(path.join(__dirname, 'src/common')));
 app.use('/model', express.static(path.join(__dirname, 'src/model')));
 
-var server = require('http').createServer(app);
 
 app.get('/', function(request, response) {
   response.sendFile(__dirname + '/dist/esmile_mobile.html')
 });
-app.get('/esmile/elcom', function(request, response) {
-   response.sendFile(__dirname + '/dist/esmile_mobile.html')
-});
 
-app.get('/mobile', function(request, response) {
-  response.sendFile(__dirname + '/dist/esmile_mobile_vinpearl.html')
-});
 app.get('/home', isLoggedIn, function(req, res){
 	common.log('Go to home page ' + ' session ID ' + req.sessionID);
 	res.send({status: 1, message: 'Success', user: req.user});
@@ -96,7 +89,7 @@ io.sockets.on('connection', function(socket){
 	  clients.push({socket_id: socket.id, user_id:'', data:[]});
 	  clearInterval(timer);
 	  timer = setInterval(()=> {
-		  request.get('http://demo.e-smile.vn:3000/farm_labiang/mobile/notify', function(error, response, body){
+		  request.get('http://demo.e-smile.vn:3000/tmv/mobile/notify', function(error, response, body){
 			//  console.dir(JSON.parse(body));
 			  if(error){
 				  common.log(error);
@@ -109,9 +102,9 @@ io.sockets.on('connection', function(socket){
 				  clients[i].data = [];
 				  for(var j = 0; j < arrReceive.length; j++){
 					  var user = arrReceive[j].user_id;
-					  if(user.indexOf(clients[i].user_id) >= 0){ 
+					 // if(user.indexOf(clients[i].user_id) >= 0){ 
 						  clients[i].data.push(arrReceive[j]);
-					  }
+					 // }
 				  }
 				  var object = {
 						    "message": "SUCCESS",
