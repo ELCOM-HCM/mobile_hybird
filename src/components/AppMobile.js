@@ -10,7 +10,7 @@ import Login from './Login';
 import Header from './Header';
 import Trend from './Trend';
 var $$ = Dom7;
-class App extends Component {
+class App extends Component { 
 	constructor(props) {
 		super(props);
 		this.state = {

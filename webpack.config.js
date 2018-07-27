@@ -10,7 +10,7 @@ module.exports = {
   module: {
     loaders: [
       { test: /\.js?$/, loader: 'babel', exclude: /node_modules/ },
-      { test: /\.s?css$/, loader: 'style!css!sass' },
+      { test: /\.s?css$/, loader: 'style!css' },
     ]
   },
   resolve: {
@@ -20,7 +20,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, '/dist'),
     publicPath: '/',
-    filename: 'elcom.esmile.dangtm.js'
+    filename: 'elcom.prime.bundle.js'
   },
   devServer: {
     contentBase: './dist',

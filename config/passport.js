@@ -44,7 +44,7 @@ module.exports = function(passport) {
 													// and password from our
 													// form
 		common.log('Loggin with username ' + username + ' password:' + password);
-		request.post('http://esmile.e-smile.vn:3000/vna/login', {form: {username: username, password: password}}, 
+		request.post('http://demo.e-smile.vn:3000/acv/login', {form: {username: username, password: password}}, 
 				function(error, response, body){
 					if(error){
 						return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
