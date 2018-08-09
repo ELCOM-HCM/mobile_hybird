@@ -18,8 +18,8 @@ class Header extends Component{
     }
     componentDidMount(){
     	let _=this;
-    	if(Common.isAndroid()){
-			  Widget.callAndroid({cmd:'get', key:'IS_NOTIFY', value:'', action: 'ELC.getData'});
+    	if(Common.isAndroid() || Common.isIOS()){
+			  Widget.callNative({cmd:'get', key:'IS_NOTIFY', value:'', action: 'ELC.getData'});
 			  var time = setInterval(function(){
 					 if(ELC.TRANSPORTER != null){
 						 if(ELC.TRANSPORTER == -1){
@@ -59,8 +59,8 @@ class Header extends Component{
 	}
 	_switchSound(){
 		  let _=this;
-		  if(Common.isAndroid()){
-			  Widget.callAndroid({cmd:'get', key:'IS_NOTIFY', value:'', action: 'ELC.getData'});
+		  if(Common.isAndroid() || Common.isIOS()){
+			  Widget.callNative({cmd:'get', key:'IS_NOTIFY', value:'', action: 'ELC.getData'});
 			  var time = setInterval(function(){
 					 if(ELC.TRANSPORTER != null){
 						 if(ELC.TRANSPORTER == -1){
@@ -71,10 +71,10 @@ class Header extends Component{
 			            clearInterval(time);
 			            var result = ELC.TRANSPORTER;
 			            if(result == "1"){
-			            	Widget.callAndroid({cmd:'set', key:'IS_NOTIFY', value:'0'});
+			            	Widget.callNative({cmd:'set', key:'IS_NOTIFY', value:'0'});
 			            	_.setState({soundStatus: "0"});
 			            } else {
-			            	Widget.callAndroid({cmd:'set', key:'IS_NOTIFY', value:'1'});
+			            	Widget.callNative({cmd:'set', key:'IS_NOTIFY', value:'1'});
 			            	_.setState({soundStatus: "1"});
 			            }
 			            ELC.TRANSPORTER = null;   
@@ -99,7 +99,7 @@ class Header extends Component{
 					      <p className="icon-user">
 					      	<img style={{width: '100px'}} src="/styles/images/user.png"/>
 					      </p>
-					      <p><i className="ios-icons">person</i>{Common.user.fullname}</p>
+					      <p><i className="fa fa-user" aria-hidden="true"></i>{Common.user.fullname}</p>
 					      {/*<p className="languages"><i className="fa fa-language" aria-hidden="true"></i>
 					      	<span><img data-id="2" onClick={(e) => this.changeLanguage(e, "2")} src="/styles/images/en.png"/></span>
 					      	<span><img data-id="1" onClick={(e) => this.changeLanguage(e, "1")} src="/styles/images/vn.png"/></span>
@@ -112,7 +112,7 @@ class Header extends Component{
 					      </p>
 					      <p>
 					      	<a onClick={this.logout.bind(this)}>
-					      		<i className="ios-icons">logout</i> LOGOUT
+					      		<i className="fa fa-sign-out" aria-hidden="true"></i> LOGOUT
 					      	</a>
 					      </p>
 					    </div>

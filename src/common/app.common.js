@@ -15,6 +15,10 @@ eCommon.isAndroid = function() {
 	return /Android/i
 			.test(navigator.userAgent) ? !0 : !1
 }
+eCommon.isIOS = function(){
+	return /iPad|iPhone|iPod/i
+			.test(navigator.userAgent) ? !0 : !1
+}
 eCommon.drawCircleChart = function(element, data){
 	var _=this;
 	var length = data.length;

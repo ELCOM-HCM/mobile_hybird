@@ -52,7 +52,7 @@ class Login extends React.Component{
 				date.setFullYear(date.getFullYear() + 10); // set expires 10 year
 				Cookie.save("user", JSON.stringify({username: username, password: password, user_id: res.user.user_id, fullname: res.user.fullname}), {expires: date});
 				Common.user = res.user;
-				Widget.callAndroid({cmd:'set', key:'USER_ID', value: Common.user.user_id});
+				Widget.callNative({cmd:'set', key:'USER_ID', value: Common.user.user_id});
 				console.log(">SEND USER_ID " + Common.user.user_id);
 				_.setState({redirectToReferrer: true});
 			} else {
@@ -86,7 +86,7 @@ class Login extends React.Component{
 				          <li className="item-content">
 				            <div className="item-inner">
 				              <div className="item-title label">
-				              	<i className="ios-icons">person</i>
+				              	<i className="fa fa-lock" aria-hidden="true"></i>
 				              </div>
 				              <div className="item-input">
 				                <input type="text" ref="username" name="username" placeholder="Username"/>
@@ -96,7 +96,7 @@ class Login extends React.Component{
 				          <li className="item-content">
 				            <div className="item-inner">
 				              <div className="item-title label">
-				          		<i className="ios-icons">lock</i>
+				              	<i className="fa fa-key" aria-hidden="true"></i>
 				          	  </div>
 				              <div className="item-input">
 				                <input onKeyPress={(e)=>{

@@ -6,7 +6,7 @@
  * 
  */
 import Common from './app.common';
-import ELC from './app.android';
+import ELC from './app';
 var Widget = {
 		TRANSPORTER: null,
 		/**
@@ -28,15 +28,22 @@ var Widget = {
 		/**
 		 * Send data Android Handler 
 		 * obj template set: {cmd:'set', key:'NOTIFY', value:'Message'}
-		 * obj template get: {cmd:'get', key:'1', action:'Widget.receiveDataAndroid'}
+		 * obj template get: {cmd:'get', key:'1', action:'ELC.getData'}
 		 */
-		callAndroid: function(obj){
+		callNative: function(obj){
 			console.log('Call Native ' + JSON.stringify(obj));
 			if(Common.isAndroid()){
 				try{
 					Android.callNative(JSON.stringify(obj));
 				}
 				catch(ex){
+					ELC.TRANSPORTER = -1;
+					console.log(ex);
+				}
+			} else if(Common.isIOS()){
+				try{
+					window.webkit.messageHandlers.callNative.postMessage(JSON.stringify(obj));
+				} catch(ex){
 					ELC.TRANSPORTER = -1;
 					console.log(ex);
 				}

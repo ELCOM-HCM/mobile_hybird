@@ -27,7 +27,7 @@ class Header extends Component{
 					<div className="right">
 						{this.props.type?
 							(<a href="#" style={{color: 'red'}} className="link icon-only open-picker" onClick={this.props.callback}><i className="fa fa-2x fa-trash-o" aria-hidden="true"></i></a>):
-							(<a href="#" className="link icon-only open-picker" onClick={this.openPicker.bind(this)}> <i className="ios-icons">more_vertical</i></a>)}
+							(<a href="#" className="link icon-only open-picker" onClick={this.openPicker.bind(this)}> <i className="fa fa-ellipsis-v" aria-hidden="true"></i></a>)}
 						
 					</div>
 				</div>
